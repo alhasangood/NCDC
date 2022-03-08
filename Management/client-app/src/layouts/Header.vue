@@ -71,12 +71,15 @@
 <script>
 export default {
   computed: {
-    user() {
-      return this.$store.state.security.user;
-    },
+    // user() {
+    //   return this.$store.state.security.user;
+    // },
   },
   data() {
     return {
+      user:{
+        centerName:null,
+      },
       searchTerm: "",
       authUser: {
         avatar: this.GetPhoto(),
@@ -107,13 +110,14 @@ export default {
       }
     },
     logout() {
-      this.$store.dispatch("security/logout").then(() => {
-        this.$router.push({ name: "Login" });
-      });
+      // this.$store.dispatch("security/logout").then(() => {
+      //   this.$router.push({ name: "Login" });
+      // });
     },
 
     GetPhoto() {
-      return "/api/profile/UserPhoto";
+      return null
+      // return "/api/profile/UserPhoto";
     },
   },
 };

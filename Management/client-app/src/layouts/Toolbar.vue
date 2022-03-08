@@ -18,11 +18,7 @@
             :prepend-icon="item.icon"
             active-class="primary white--text"
             v-if="
-              item.subNavs &&
-              ($hasPermission(item.code) ||
-                $hasPermission(item.code2) ||
-                $hasPermission(item.code3))
-            "
+              item.subNavs            "
           >
             <template v-slot:activator>
               <v-list-item-content>
@@ -31,7 +27,6 @@
             </template>
             <template v-for="(subitem, i) in item.subNavs">
               <v-list-item
-                v-if="$hasPermission(subitem.code)"
                 :key="i"
                 :to="subitem.link"
                 active-class="primary--text"
@@ -48,7 +43,6 @@
             :to="item.link"
             active-class="primary white--text"
             ripple
-            v-else-if="$hasPermission(item.code)"
           >
             <v-list-item-icon>
               <v-icon v-text="item.icon"></v-icon>
@@ -71,11 +65,7 @@
           <!-- Header with sub-features -->
           <template
             v-if="
-              item.subNavs &&
-              ($hasPermission(item.code) ||
-                $hasPermission(item.code2) ||
-                $hasPermission(item.code3))
-            "
+              item.subNavs "
           >
             <v-menu
               :key="item.title"
@@ -94,7 +84,6 @@
               <v-list>
                 <template v-for="(subitem, i) in item.subNavs">
                   <v-list-item
-                    v-if="$hasPermission(subitem.code)"
                     :key="i"
                     :to="subitem.link"
                     active-class="primary--text"
@@ -110,7 +99,7 @@
           </template>
 
           <!-- Features -->
-          <template  v-else-if="$hasPermission(item.code)">
+          <template  >
           <v-list-item
             :key="item.title"
             :to="item.link"
