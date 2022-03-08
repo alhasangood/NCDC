@@ -1,0 +1,13 @@
+input {
+  font-size: 14px;
+}
+
+.form-label {
+  color: #888ea8;
+  font-size: 15px;
+  // letter-spacing: 1px;
+}
+
+.v-input--is-focused .v-input__slot {
+  box-shadow: 0 0 5px 2px #ffc2c29e !important;
+}

@@ -1,0 +1,61 @@
+@import "./font.scss";
+@import "./table.scss";
+@import "./pagination.scss";
+@import "./form.scss";
+
+html {
+  color: #888ea8;
+  height: 100%;
+  font-size: 0.875rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  letter-spacing: 0.0312rem;
+  width: 100%;
+  margin: 0 auto;
+  
+
+}
+
+.card-area {
+  border-radius: 6px;
+  border: 1px solid #e0e6ed;
+  box-shadow: 0 0 40px 0 rgb(94 92 154 / 6%);
+}
+
+.card-title {
+  color: #3b3f5c;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+
+.sub-header-details{
+  border-right: 3px solid #1c9aafeb;
+    padding-right: 15px;
+    // margin: 20px;
+    display: block;
+}
+.processingManagement{
+
+    .v-expansion-panel
+    {
+      margin-bottom: 10px;
+    }
+}
+.theme--light.v-expansion-panels .v-expansion-panel{
+  color: white !important;
+}
+.theme--light.v-expansion-panels .v-expansion-panel-header .v-expansion-panel-header__icon .v-icon {
+    color: white !important;
+}
+
+
+.theme--light.v-tabs-items {
+  background-color: #FFFFFF;
+  min-height: 30vh;
+}
+
+.theme--light.v-tabs > .v-tabs-bar {
+  margin: 16px!important;
+  background-color: #e8f6f8  !important;
+}

@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\alhasan\\source\\repos\\NCDC\\Management\\Management.csproj": {}
+    "D:\\projects\\NCDC\\Management\\Management.csproj": {}
   },
   "projects": {
-    "C:\\Users\\alhasan\\source\\repos\\NCDC\\Management\\Management.csproj": {
+    "D:\\projects\\NCDC\\Management\\Management.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\alhasan\\source\\repos\\NCDC\\Management\\Management.csproj",
+        "projectUniqueName": "D:\\projects\\NCDC\\Management\\Management.csproj",
         "projectName": "Management",
-        "projectPath": "C:\\Users\\alhasan\\source\\repos\\NCDC\\Management\\Management.csproj",
-        "packagesPath": "C:\\Users\\alhasan\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\alhasan\\source\\repos\\NCDC\\Management\\obj\\",
+        "projectPath": "D:\\projects\\NCDC\\Management\\Management.csproj",
+        "packagesPath": "C:\\Users\\pc\\.nuget\\packages\\",
+        "outputPath": "D:\\projects\\NCDC\\Management\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\alhasan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -28,8 +28,8 @@
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "C:\\Users\\alhasan\\source\\repos\\NCDC\\Model\\Models.csproj": {
-                "projectPath": "C:\\Users\\alhasan\\source\\repos\\NCDC\\Model\\Models.csproj"
+              "D:\\projects\\NCDC\\Model\\Models.csproj": {
+                "projectPath": "D:\\projects\\NCDC\\Model\\Models.csproj"
               }
             }
           }
@@ -77,6 +77,24 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[5.0.0, 5.0.0]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[5.0.14, 5.0.14]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[5.0.0, 5.0.0]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[5.0.0, 5.0.0]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -85,21 +103,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.102\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.200\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\alhasan\\source\\repos\\NCDC\\Model\\Models.csproj": {
+    "D:\\projects\\NCDC\\Model\\Models.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\alhasan\\source\\repos\\NCDC\\Model\\Models.csproj",
+        "projectUniqueName": "D:\\projects\\NCDC\\Model\\Models.csproj",
         "projectName": "Models",
-        "projectPath": "C:\\Users\\alhasan\\source\\repos\\NCDC\\Model\\Models.csproj",
-        "packagesPath": "C:\\Users\\alhasan\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\alhasan\\source\\repos\\NCDC\\Model\\obj\\",
+        "projectPath": "D:\\projects\\NCDC\\Model\\Models.csproj",
+        "packagesPath": "C:\\Users\\pc\\.nuget\\packages\\",
+        "outputPath": "D:\\projects\\NCDC\\Model\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\alhasan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -156,7 +174,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.102\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.200\\RuntimeIdentifierGraph.json"
         }
       }
     }
