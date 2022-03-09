@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\alhasan\\source\\repos\\NCDC\\Model\\Models.csproj": {}
+    "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Model\\Models.csproj": {}
   },
   "projects": {
-    "C:\\Users\\alhasan\\source\\repos\\NCDC\\Model\\Models.csproj": {
+    "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Model\\Models.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\alhasan\\source\\repos\\NCDC\\Model\\Models.csproj",
+        "projectUniqueName": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Model\\Models.csproj",
         "projectName": "Models",
-        "projectPath": "C:\\Users\\alhasan\\source\\repos\\NCDC\\Model\\Models.csproj",
+        "projectPath": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Model\\Models.csproj",
         "packagesPath": "C:\\Users\\alhasan\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\alhasan\\source\\repos\\NCDC\\Model\\obj\\",
+        "outputPath": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Model\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\alhasan\\AppData\\Roaming\\NuGet\\NuGet.Config",

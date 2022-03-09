@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\alhasan\\source\\repos\\NCDC\\Management\\Management.csproj": {}
+    "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Management\\Management.csproj": {}
   },
   "projects": {
-    "C:\\Users\\alhasan\\source\\repos\\NCDC\\Management\\Management.csproj": {
+    "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Management\\Management.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\alhasan\\source\\repos\\NCDC\\Management\\Management.csproj",
+        "projectUniqueName": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Management\\Management.csproj",
         "projectName": "Management",
-        "projectPath": "C:\\Users\\alhasan\\source\\repos\\NCDC\\Management\\Management.csproj",
+        "projectPath": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Management\\Management.csproj",
         "packagesPath": "C:\\Users\\alhasan\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\alhasan\\source\\repos\\NCDC\\Management\\obj\\",
+        "outputPath": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Management\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\alhasan\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -28,8 +28,8 @@
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "C:\\Users\\alhasan\\source\\repos\\NCDC\\Model\\Models.csproj": {
-                "projectPath": "C:\\Users\\alhasan\\source\\repos\\NCDC\\Model\\Models.csproj"
+              "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Model\\Models.csproj": {
+                "projectPath": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Model\\Models.csproj"
               }
             }
           }
@@ -58,13 +58,33 @@
               "target": "Package",
               "version": "[3.1.4, )"
             },
+            "Microsoft.OpenApi": {
+              "target": "Package",
+              "version": "[1.2.3, )"
+            },
             "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
               "target": "Package",
               "version": "[1.10.9, )"
             },
+            "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
+              "target": "Package",
+              "version": "[3.1.1, )"
+            },
+            "NSwag.Generation.AspNetCore": {
+              "target": "Package",
+              "version": "[13.15.10, )"
+            },
             "Serilog": {
               "target": "Package",
               "version": "[2.10.0, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.3.0, )"
+            },
+            "System.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.8.3, )"
             }
           },
           "imports": [
@@ -89,14 +109,14 @@
         }
       }
     },
-    "C:\\Users\\alhasan\\source\\repos\\NCDC\\Model\\Models.csproj": {
+    "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Model\\Models.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\alhasan\\source\\repos\\NCDC\\Model\\Models.csproj",
+        "projectUniqueName": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Model\\Models.csproj",
         "projectName": "Models",
-        "projectPath": "C:\\Users\\alhasan\\source\\repos\\NCDC\\Model\\Models.csproj",
+        "projectPath": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Model\\Models.csproj",
         "packagesPath": "C:\\Users\\alhasan\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\alhasan\\source\\repos\\NCDC\\Model\\obj\\",
+        "outputPath": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Model\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\alhasan\\AppData\\Roaming\\NuGet\\NuGet.Config",
