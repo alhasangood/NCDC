@@ -1,13 +1,10 @@
 <template>
-  <div class="header">
-    <v-row class="header">
-      <v-col cols="12" sm="3">
-        <img src="@/assets/logo.svg" height="70" />
-      </v-col>
-
-      <v-spacer />
-
-      <v-col cols="12" sm="12" md="4" class="mt-6">
+<v-app-bar
+  dense app flat
+>
+      <div class="container-fluid py-1 px-3">
+     <v-row>
+       <v-col cols="12" sm="12" md="4" class="mt-6">
         <h3 class="secondary--text">
           {{ user.centerName }}
         </h3>
@@ -63,8 +60,9 @@
           </v-list>
         </v-menu>
       </v-col>
-    </v-row>
-  </div>
+     </v-row>
+      </div>
+</v-app-bar>
 </template>
 
 

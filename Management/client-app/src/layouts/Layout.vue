@@ -1,12 +1,17 @@
 <template>
-  <div> 
+  <div class="bg-gray-100"> 
     <AppHeader />
     <AppToolbar />
       <v-scroll-y-transition mode="out-in">
-        <div class="layout">
+   
+         <v-main>
 
-          <router-view />
-        </div>
+    <v-container fluid>
+
+      <router-view></router-view>
+    </v-container>
+  </v-main>
+
       </v-scroll-y-transition>
     <AppFooter />
   </div>
