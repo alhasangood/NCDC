@@ -1,14 +1,21 @@
 <template>
-  <div class="toolbar">
-    <v-navigation-drawer
-      app
+
+    <v-navigation-drawer  app
       width="250"
-      v-model="sidebar"
       enable-resize-watcher
-      clipped
+      flat
       right
-      class="hidden-lg-and-up"
+      class="hidden-xs-and-down bg-gray-100"
     >
+      <v-list-item>
+        <v-list-item-content>
+          <v-list-item-title class="text-h6">
+            Application
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
+<hr class="horizontal  px-2">
       <v-list dense nav expand class="ma-2">
         <template v-for="(item, j) in navItems">
           <!-- Header with sub-features -->
@@ -16,7 +23,7 @@
             :key="item.title"
             :group="item.group"
             :prepend-icon="item.icon"
-            active-class="primary white--text"
+            active-class="white secondary--text"
             v-if="
               item.subNavs            "
           >
@@ -29,7 +36,7 @@
               <v-list-item
                 :key="i"
                 :to="subitem.link"
-                active-class="primary--text"
+                active-class="secondary--text"
                 ripple
               >
                 <v-list-item-title v-text="subitem.title"></v-list-item-title>
@@ -41,11 +48,12 @@
           <v-list-item
             :key="j"
             :to="item.link"
-            active-class="primary white--text"
+            active-class="white secondary--text"
             ripple
           >
-            <v-list-item-icon>
-              <v-icon v-text="item.icon"></v-icon>
+            <v-list-item-icon    class="primary--text">
+              <v-icon v-text="item.icon"         
+></v-icon>
             </v-list-item-icon>
             <v-list-item-title
               v-text="item.title"
@@ -56,71 +64,7 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-toolbar class="topbar-nav" v-model="sidebar">
-      <span class="hidden-lg-and-up">
-        <v-app-bar-nav-icon @click="sidebar = !sidebar" class="white--text" />
-      </span>
-      <v-toolbar-items class="hidden-md-and-down" fluid>
-        <template v-for="(item, j) in navItems">
-          <!-- Header with sub-features -->
-          <template
-            v-if="
-              item.subNavs "
-          >
-            <v-menu
-              :key="item.title"
-              rounded="true"
-              active-class="white--text"
-              offset-y
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn v-bind="attrs" v-on="on" text class="btn-subMenu">
-                  <v-icon v-text="item.icon" class="ml-3"></v-icon>
-                  {{ item.title }}
-                  <v-icon class="menu-icon">mdi-menu-down</v-icon>
-                </v-btn>
-              </template>
-              
-              <v-list>
-                <template v-for="(subitem, i) in item.subNavs">
-                  <v-list-item
-                    :key="i"
-                    :to="subitem.link"
-                    active-class="primary--text"
-                    ripple
-                  >
-                    <v-list-item-title
-                      v-text="subitem.title"
-                    ></v-list-item-title>
-                  </v-list-item>
-                </template>
-              </v-list>
-            </v-menu>
-          </template>
-
-          <!-- Features -->
-          <template  >
-          <v-list-item
-            :key="item.title"
-            :to="item.link"
-            ripple          
-          >
-            <v-list-item-icon>
-              <v-icon v-text="item.icon" class="white--text"></v-icon>
-            </v-list-item-icon>
-            <v-list-item-title
-              v-text="item.title"
-              class="white--text"
-            ></v-list-item-title>
-          </v-list-item>
-          <v-divider inset vertical :key="j" ></v-divider>
-          </template>
-
-        </template>
-      </v-toolbar-items>
-    </v-toolbar>
-  </div>
-</template>
+ </template>
 
 <script>
 export default {
