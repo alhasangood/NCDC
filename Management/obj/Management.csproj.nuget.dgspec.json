@@ -4,6 +4,16 @@
     "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Management\\Management.csproj": {}
   },
   "projects": {
+    "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Common\\Common.csproj": {
+      "restore": {
+        "projectUniqueName": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Common\\Common.csproj",
+        "projectName": "Common",
+        "projectPath": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Common\\Common.csproj"
+      },
+      "frameworks": {
+        "net20": {}
+      }
+    },
     "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Management\\Management.csproj": {
       "version": "1.0.0",
       "restore": {
@@ -28,6 +38,9 @@
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
+              "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Common\\Common.csproj": {
+                "projectPath": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Common\\Common.csproj"
+              },
               "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Model\\Models.csproj": {
                 "projectPath": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Model\\Models.csproj"
               }

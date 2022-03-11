@@ -2687,6 +2687,15 @@
           "lib/netstandard1.3/System.Xml.XmlSerializer.dll": {}
         }
       },
+      "Common/1.0.0": {
+        "type": "project",
+        "compile": {
+          "bin/placeholder/Common.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Common.dll": {}
+        }
+      },
       "Models/1.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
@@ -8858,6 +8867,11 @@
         "system.xml.xmlserializer.nuspec"
       ]
     },
+    "Common/1.0.0": {
+      "type": "project",
+      "path": "../Common/Common.csproj",
+      "msbuildProject": "../Common/Common.csproj"
+    },
     "Models/1.0.0": {
       "type": "project",
       "path": "../Model/Models.csproj",
@@ -8866,6 +8880,7 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
+      "Common >= 1.0.0",
       "Microsoft.EntityFrameworkCore >= 3.1.4",
       "Microsoft.EntityFrameworkCore.SqlServer >= 3.1.4",
       "Microsoft.EntityFrameworkCore.Tools >= 3.1.4",
@@ -8906,6 +8921,9 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
+            "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Common\\Common.csproj": {
+              "projectPath": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Common\\Common.csproj"
+            },
             "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Model\\Models.csproj": {
               "projectPath": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Model\\Models.csproj"
             }

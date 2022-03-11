@@ -1,10 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Common;
+using Management.ViewModels;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
+ 
 namespace Managment.Controllers
 {
     [Route("api/[controller]")]
@@ -38,7 +42,7 @@ namespace Managment.Controllers
                     return BadRequest(new { StatusCode = 919003, result = "يرجي التأكد من البيانات" });
                 }
 
-                var UsersQuery = from a in db.MaestroUsers
+                var UsersQuery = from a in db.Users
                                  where a.Status != Status.Deleted
                                  select a;
 
@@ -50,15 +54,13 @@ namespace Managment.Controllers
                 }
 
                 var Users = await (from a in UsersQuery
-                                   orderby a.MaestroUserId descending
+                                   orderby a.UserId descending
                                    select new
                                    {
-                                       a.MaestroUserId,
+                                       a.UserId,
                                        a.LoginName,
                                        a.FullName,
-                                       a.MobileNo,
-                                       a.JobDesc,
-                                       a.CreatedOn,
+                                         a.CreatedOn,
                                        a.Status
                                    }).Skip((pageNo - 1) * pageSize).Take(pageSize).ToListAsync();
 
@@ -133,44 +135,40 @@ namespace Managment.Controllers
                 //int x = randomGuid.ToString().IndexOf("-");
                 //string password = randomGuid.ToString().Substring(0, x);
 
-                MaestroUsers addUser = new MaestroUsers()
+                Users addUser = new Users()
                 {
                     FullName = userInfo.FullName,
-                    JobDesc = userInfo.JobDesc,
-                    LoginName = userInfo.LoginName,
-                    MobileNo = userInfo.MobileNo,
-                    Email = userInfo.Email,
+                     LoginName = userInfo.LoginName,
+                     Email = userInfo.Email,
                     Password = Security.ComputeHash(userInfo.Password, HashAlgorithms.SHA512, null),
                     LoginTryAttempts = 0,
                     CreatedBy = UserId(),
                     CreatedOn = DateTime.Now,
                     Status = Status.Active
                 };
-                await db.MaestroUsers.AddAsync(addUser);
+                await db.Users.AddAsync(addUser);
 
 
                 foreach (var permission in userInfo.SelectedPermissions)
                 {
-                    MaestroUserPermissions newPermission = new MaestroUserPermissions()
+                    UserPermissions newPermission = new UserPermissions()
                     {
-                        MaestroUserId = addUser.MaestroUserId,
+                        UserId = addUser.UserId,
                         PermissionId = permission,
                         CreatedBy = UserId(),
                         CreatedOn = DateTime.Now,
                     };
-                    addUser.MaestroUserPermissions.Add(newPermission);
+                    addUser.UserPermissionsUser.Add(newPermission);
                 }
                 await db.SaveChangesAsync();
 
-                var addedUser = await (from a in db.MaestroUsers
-                                       where a.MaestroUserId == addUser.MaestroUserId
+                var addedUser = await (from a in db.Users
+                                       where a.UserId == addUser.UserId
                                        select new
                                        {
-                                           a.MaestroUserId,
+                                           a.UserId,
                                            a.LoginName,
                                            a.FullName,
-                                           a.MobileNo,
-                                           a.JobDesc,
                                            a.CreatedOn,
                                            a.Status
                                        }).SingleOrDefaultAsync();
@@ -203,27 +201,25 @@ namespace Managment.Controllers
                 //}
 
 
-                var userInfo = await (from a in db.MaestroUsers
-                                      where a.MaestroUserId == userId
+                var userInfo = await (from a in db.Users
+                                      where a.UserId == userId
                                       && a.Status != Status.Deleted
                                       select new
                                       {
-                                          a.MaestroUserId,
+                                          a.UserId,
                                           a.LoginName,
                                           a.FullName,
-                                          a.JobDesc,
-                                          a.MobileNo,
                                           a.Email,
                                           selectedPermissions = (from f in db.Features
-                                                                 join p in db.MaestroUserPermissions on f.FeatureId equals p.Permission.FeatureId
+                                                                 join p in db.UserPermissions on f.FeatureId equals p.Permission.FeatureId
                                                                  where f.FeatureType == 1
-                                                                 && p.MaestroUserId == userId
+                                                                 && p.UserId == userId
                                                                  select new
                                                                  {
                                                                      f.FeatureId,
                                                                      f.FeatureName,
-                                                                     permissions = (from a in db.MaestroUserPermissions
-                                                                                    where a.MaestroUserId == userId
+                                                                     permissions = (from a in db.UserPermissions
+                                                                                    where a.UserId == userId
                                                                                     && a.Permission.FeatureId == f.FeatureId
                                                                                     select a.Permission.PermissionName).ToList()
                                                                  }).Distinct().ToList(),
@@ -258,20 +254,18 @@ namespace Managment.Controllers
                 {
                     return BadRequest(new { StatusCode = 919047, result = "يرجي التأكد من بيانات المستخدم." });
                 }
-                var userInfo = await (from a in db.MaestroUsers
-                                      where a.MaestroUserId == userId
+                var userInfo = await (from a in db.Users
+                                      where a.UserId == userId
                                          && a.Status != Status.Deleted
                                       select new
                                       {
-                                          a.MaestroUserId,
+                                          a.UserId,
                                           a.LoginName,
                                           a.FullName,
-                                          a.JobDesc,
-                                          a.MobileNo,
                                           a.Email,
-                                          selectedUserPermissions = (from p in db.MaestroUserPermissions
-                                                                     where p.MaestroUserId == userId
-                                                                     join u in db.MaestroUserPermissions.Where(z => z.MaestroUserId == UserId()) on p.PermissionId equals u.PermissionId
+                                          selectedUserPermissions = (from p in db.UserPermissions
+                                                                     where p.UserId == userId
+                                                                     join u in db.UserPermissions.Where(z => z.UserId == UserId()) on p.PermissionId equals u.PermissionId
                                                                      select p.PermissionId).ToList()
                                       }).SingleOrDefaultAsync();
 
@@ -298,7 +292,7 @@ namespace Managment.Controllers
                 //{
                 //    return BadRequest(new { StatusCode = 919018, result =noPermission });
                 //}
-                if (userInfo.MaestroUserId <= 0)
+                if (userInfo.UserId <= 0)
                 {
                     return BadRequest(new { StatusCode = 919019, result = "يرجي اختيار المستخدم." });
                 }
@@ -347,8 +341,8 @@ namespace Managment.Controllers
                     return BadRequest(new { statusCode = 919012, result = "اسم الدخول مستخدم مسبقا الرجاء ادخال اسم دخول اخر" });
                 }
 
-                var userData = await (from a in db.MaestroUsers
-                                      where a.MaestroUserId == userInfo.MaestroUserId
+                var userData = await (from a in db.Users
+                                      where a.UserId == userInfo.UserId
                                       select a).SingleOrDefaultAsync();
 
                 if (userData == null)
@@ -357,15 +351,14 @@ namespace Managment.Controllers
                 }
 
                 userData.FullName = userInfo.FullName;
-                userData.JobDesc = userInfo.JobDesc;
                 userData.LoginName = userInfo.LoginName;
-                userData.MobileNo = userInfo.MobileNo;
+
                 userData.ModifiedBy = UserId();
                 userData.ModifiedOn = DateTime.Now;
 
 
-                var oldPermissions = await (from a in db.MaestroUserPermissions
-                                            where a.MaestroUserId == userInfo.MaestroUserId
+                var oldPermissions = await (from a in db.UserPermissions
+                                            where a.UserId == userInfo.UserId
                                             select a.PermissionId).ToListAsync();
                 foreach (int permission in oldPermissions)
                 {
@@ -375,24 +368,24 @@ namespace Managment.Controllers
                     }
                     else
                     {
-                        var removePermission = await (from p in db.MaestroUserPermissions
+                        var removePermission = await (from p in db.UserPermissions
                                                       where p.PermissionId == permission
-                                                      && p.MaestroUserId == userInfo.MaestroUserId
+                                                      && p.UserId == userInfo.UserId
                                                       select p).SingleOrDefaultAsync();
-                        db.MaestroUserPermissions.Remove(removePermission);
+                        db.UserPermissions.Remove(removePermission);
                     }
                 }
 
                 foreach (int permission in userInfo.SelectedPermissions)
                 {
-                    MaestroUserPermissions newPermission = new MaestroUserPermissions()
+                    UserPermissions newPermission = new UserPermissions()
                     {
-                        MaestroUserId = userData.MaestroUserId,
+                        UserId = userData.UserId,
                         PermissionId = permission,
                         CreatedBy = UserId(),
                         CreatedOn = DateTime.Now
                     };
-                    await db.MaestroUserPermissions.AddAsync(newPermission);
+                    await db.UserPermissions.AddAsync(newPermission);
                 }
 
                 await db.SaveChangesAsync();
@@ -424,8 +417,8 @@ namespace Managment.Controllers
                 //    return BadRequest(new { statusCode = 919029, result = "ليس لديك الصلاحيات اللازمة لتنفيذ الامر" });
                 //}
 
-                var user = await (from a in db.MaestroUsers
-                                  where a.MaestroUserId == userId
+                var user = await (from a in db.Users
+                                  where a.UserId == userId
                                   && a.Status != Status.Deleted
                                   select a).SingleOrDefaultAsync();
 
@@ -471,8 +464,8 @@ namespace Managment.Controllers
                 //    return BadRequest(new { statusCode = 919034, result = "ليس لديك الصلاحيات اللازمة لتنفيذ الامر" });
                 //}
 
-                var user = await (from a in db.MaestroUsers
-                                  where a.MaestroUserId == userId
+                var user = await (from a in db.Users
+                                  where a.UserId == userId
                                   && a.Status != Status.Deleted
                                   select a).SingleOrDefaultAsync();
 
@@ -518,8 +511,8 @@ namespace Managment.Controllers
                 //    return BadRequest(new { statusCode = 919039, result = "ليس لديك الصلاحيات اللازمة لتنفيذ الامر" });
                 //}
 
-                var user = await (from a in db.MaestroUsers
-                                  where a.MaestroUserId == userId
+                var user = await (from a in db.Users
+                                  where a.UserId == userId
                                   select a).SingleOrDefaultAsync();
 
                 if (user == null)

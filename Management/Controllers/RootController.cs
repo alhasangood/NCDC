@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+ using Common;
 
 
 namespace Managment.Controllers
@@ -27,8 +28,8 @@ namespace Managment.Controllers
         {
             try
             {
-                var userPermisions = (from p in db.MaestroUserPermissions
-                                      where p.MaestroUserId == UserId()
+                var userPermisions = (from p in db.UserPermissions
+                                      where p.UserId == UserId()
                                       && p.Permission.Code == permissionCode
                                       select p).Count();
 
