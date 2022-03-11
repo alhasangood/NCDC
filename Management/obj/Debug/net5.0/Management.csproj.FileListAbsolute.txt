@@ -182,3 +182,5 @@ C:\Users\alhasan\source\repos\aya\NCDC\Management\obj\Debug\net5.0\Management.dl
 C:\Users\alhasan\source\repos\aya\NCDC\Management\obj\Debug\net5.0\ref\Management.dll
 C:\Users\alhasan\source\repos\aya\NCDC\Management\obj\Debug\net5.0\Management.pdb
 C:\Users\alhasan\source\repos\aya\NCDC\Management\obj\Debug\net5.0\Management.genruntimeconfig.cache
+C:\Users\alhasan\source\repos\aya\NCDC\Management\bin\Debug\net5.0\Common.dll
+C:\Users\alhasan\source\repos\aya\NCDC\Management\bin\Debug\net5.0\Common.pdb
