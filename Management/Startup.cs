@@ -52,6 +52,7 @@ namespace Management
             //});
 
             services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
+            //services.AddSwaggerGen();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

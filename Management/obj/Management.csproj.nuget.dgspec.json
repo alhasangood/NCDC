@@ -1,20 +1,30 @@
 {
   "format": 1,
   "restore": {
-    "D:\\projects\\NCDC\\Management\\Management.csproj": {}
+    "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Management\\Management.csproj": {}
   },
   "projects": {
-    "D:\\projects\\NCDC\\Management\\Management.csproj": {
+    "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Common\\Common.csproj": {
+      "restore": {
+        "projectUniqueName": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Common\\Common.csproj",
+        "projectName": "Common",
+        "projectPath": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Common\\Common.csproj"
+      },
+      "frameworks": {
+        "net20": {}
+      }
+    },
+    "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Management\\Management.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\projects\\NCDC\\Management\\Management.csproj",
+        "projectUniqueName": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Management\\Management.csproj",
         "projectName": "Management",
-        "projectPath": "D:\\projects\\NCDC\\Management\\Management.csproj",
-        "packagesPath": "C:\\Users\\pc\\.nuget\\packages\\",
-        "outputPath": "D:\\projects\\NCDC\\Management\\obj\\",
+        "projectPath": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Management\\Management.csproj",
+        "packagesPath": "C:\\Users\\alhasan\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Management\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\alhasan\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -28,8 +38,11 @@
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "D:\\projects\\NCDC\\Model\\Models.csproj": {
-                "projectPath": "D:\\projects\\NCDC\\Model\\Models.csproj"
+              "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Common\\Common.csproj": {
+                "projectPath": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Common\\Common.csproj"
+              },
+              "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Model\\Models.csproj": {
+                "projectPath": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Model\\Models.csproj"
               }
             }
           }
@@ -58,13 +71,33 @@
               "target": "Package",
               "version": "[3.1.4, )"
             },
+            "Microsoft.OpenApi": {
+              "target": "Package",
+              "version": "[1.2.3, )"
+            },
             "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
               "target": "Package",
               "version": "[1.10.9, )"
             },
+            "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
+              "target": "Package",
+              "version": "[3.1.1, )"
+            },
+            "NSwag.Generation.AspNetCore": {
+              "target": "Package",
+              "version": "[13.15.10, )"
+            },
             "Serilog": {
               "target": "Package",
               "version": "[2.10.0, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.3.0, )"
+            },
+            "System.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.8.3, )"
             }
           },
           "imports": [
@@ -77,24 +110,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[5.0.0, 5.0.0]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[5.0.14, 5.0.14]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[5.0.0, 5.0.0]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[5.0.0, 5.0.0]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -103,21 +118,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.200\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.102\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\projects\\NCDC\\Model\\Models.csproj": {
+    "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Model\\Models.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\projects\\NCDC\\Model\\Models.csproj",
+        "projectUniqueName": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Model\\Models.csproj",
         "projectName": "Models",
-        "projectPath": "D:\\projects\\NCDC\\Model\\Models.csproj",
-        "packagesPath": "C:\\Users\\pc\\.nuget\\packages\\",
-        "outputPath": "D:\\projects\\NCDC\\Model\\obj\\",
+        "projectPath": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Model\\Models.csproj",
+        "packagesPath": "C:\\Users\\alhasan\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\alhasan\\source\\repos\\aya\\NCDC\\Model\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\alhasan\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -174,7 +189,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.200\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.102\\RuntimeIdentifierGraph.json"
         }
       }
     }

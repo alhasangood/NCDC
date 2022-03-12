@@ -8,7 +8,7 @@
         <a
           href="http://www.google.com/"
           target="_blank"
-        >CoreTec LTD</a>
+        ></a>
       </v-col>
     </v-row>
   </v-footer>
