@@ -1,70 +1,57 @@
 <template>
+  <v-navigation-drawer
+    app
+    width="250"
+    enable-resize-watcher
+    flat
+    right
+    class="hidden-xs-and-down bg-gray-100"
+  >
+    <v-list-item>
+      <v-list-item-content>
+        <v-list-item-title class="text-h6"> Application </v-list-item-title>
+      </v-list-item-content>
+    </v-list-item>
 
-    <v-navigation-drawer  app
-      width="250"
-      enable-resize-watcher
-      flat
-      right
-      class="hidden-xs-and-down bg-gray-100"
-    >
-      <v-list-item>
-        <v-list-item-content>
-          <v-list-item-title class="text-h6">
-            Application
-          </v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
+    <hr class="horizontal px-2" />
+    <v-list dense nav expand class="ma-2">
+      <template v-for="(item, j) in navItems">
+        <!-- Header with sub-features -->
+        <v-list-group
+          :key="item.title"
+          :group="item.group"
+          :prepend-icon="item.icon"
+          active-class="white secondary--text"
+          v-if="item.subNavs"
+        >
+          <template v-slot:activator>
+            <v-list-item-content>
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
+            </v-list-item-content>
+          </template>
+          <template v-for="(subitem, i) in item.subNavs">
+            <v-list-item
+              :key="i"
+              :to="subitem.link"
+              active-class="secondary--text"
+              ripple
+            >
+              <v-list-item-title v-text="subitem.title"></v-list-item-title>
+            </v-list-item>
+          </template>
+        </v-list-group>
 
-<hr class="horizontal  px-2">
-      <v-list dense nav expand class="ma-2">
-        <template v-for="(item, j) in navItems">
-          <!-- Header with sub-features -->
-          <v-list-group
-            :key="item.title"
-            :group="item.group"
-            :prepend-icon="item.icon"
-            active-class="white secondary--text"
-            v-if="
-              item.subNavs            "
-          >
-            <template v-slot:activator>
-              <v-list-item-content>
-                <v-list-item-title>{{ item.title }}</v-list-item-title>
-              </v-list-item-content>
-            </template>
-            <template v-for="(subitem, i) in item.subNavs">
-              <v-list-item
-                :key="i"
-                :to="subitem.link"
-                active-class="secondary--text"
-                ripple
-              >
-                <v-list-item-title v-text="subitem.title"></v-list-item-title>
-              </v-list-item>
-            </template>
-          </v-list-group>
-
-          <!-- Features -->
-          <v-list-item
-            :key="j"
-            :to="item.link"
-            active-class="white secondary--text"
-            ripple
-          >
-            <v-list-item-icon    class="primary--text">
-              <v-icon v-text="item.icon"         
-></v-icon>
-            </v-list-item-icon>
-            <v-list-item-title
-              v-text="item.title"
-              class="ml-5"
-            ></v-list-item-title>
-          </v-list-item>
-        </template>
-      </v-list>
-    </v-navigation-drawer>
-
- </template>
+        <!-- Features -->
+        <v-list-item :key="j" :to="item.link" active-class="white secondary--text" ripple>
+          <v-list-item-icon class="primary--text">
+            <v-icon v-text="item.icon"></v-icon>
+          </v-list-item-icon>
+          <v-list-item-title v-text="item.title" class="ml-5"></v-list-item-title>
+        </v-list-item>
+      </template>
+    </v-list>
+  </v-navigation-drawer>
+</template>
 
 <script>
 export default {
@@ -83,7 +70,7 @@ export default {
 </script>
 <style scoped>
 .toolbar {
-      max-width: 80% !important;
+  max-width: 80% !important;
 
   margin: 0px auto;
 }
@@ -149,4 +136,3 @@ export default {
   padding-right: 20px;
 }
 </style>
-

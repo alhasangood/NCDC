@@ -1,70 +1,65 @@
 <template>
-<v-app-bar
-  dense app flat
->
-      <div class="container-fluid py-1 px-3">
-     <v-row>
-       <v-col cols="12" sm="12" md="4" class="mt-6">
-        <h3 class="secondary--text">
-          {{ user.centerName }}
-        </h3>
-      </v-col>
-      <v-col cols="12" sm="6" md="2" class="mt-5">
-        <v-text-field
-          v-model="searchTerm"
-          dense
-          flat
-          rounded
-          solo-inverted
-          label="البحث السريع"
-        >
-          <v-icon @click="Search()" slot="append" color="white"
-            >mdi-magnify</v-icon
+  <v-app-bar dense app flat>
+    <div class="container-fluid py-1">
+      <v-row class="mt-5">
+      <v-spacer/>
+        <v-col cols="12" sm="12" md="4" class="mt-6">
+          <h3 class="secondary--text">
+            {{ user.centerName }}
+          </h3>
+        </v-col>
+        <v-col cols="12" sm="6" md="2" class="mt-5">
+          <v-text-field
+            v-model="searchTerm"
+            dense
+            flat
+            rounded
+            solo-inverted
+            label="البحث السريع"
           >
-        </v-text-field>
-      </v-col>
+            <v-icon @click="Search()" slot="append" color="white">mdi-magnify</v-icon>
+          </v-text-field>
+        </v-col>
 
-      <v-col cols="12" sm="1" class="mt-5 text-center">
-        <!-- Profile Menu -->
-        <v-menu
-          bottom
-          offset-y
-          transition="slide-y-reverse-transition"
-          rounded="lg"
-          class="text-left"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn icon v-bind="attrs" v-on="on">
-              <v-avatar color="blue" size="40">
-                <span class="white--text text-h5">{{ initials }}</span>
-              </v-avatar>
-            </v-btn>
-          </template>
+        <v-col cols="12" sm="1" class="mt-5 text-center">
+          <!-- Profile Menu -->
+          <v-menu
+            bottom
+            offset-y
+            transition="slide-y-reverse-transition"
+            rounded="lg"
+            class="text-left"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn icon v-bind="attrs" v-on="on">
+                <v-avatar color="blue" size="40">
+                  <span class="white--text text-h5">{{ initials }}</span>
+                </v-avatar>
+              </v-btn>
+            </template>
 
-          <v-list class="px-2">        
-            <!-- <v-list-item>
+            <v-list class="px-2">
+              <!-- <v-list-item>
               <v-list-item-content>
                 <v-list-item-title> {{ user.userName }} </v-list-item-title>
               </v-list-item-content>
             </v-list-item>  -->
-            <v-list-item v-for="(item, i) in items" :key="i" :to="item.link">
-              <v-list-item-title>{{ item.text }}</v-list-item-title>
-              
-            </v-list-item>
-          <v-divider ></v-divider>
-            <v-list-item @click="logout">
-              <v-list-item-content>
-                <v-list-item-title>تسجيل خروج</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-      </v-col>
-     </v-row>
-      </div>
-</v-app-bar>
+              <v-list-item v-for="(item, i) in items" :key="i" :to="item.link">
+                <v-list-item-title>{{ item.text }}</v-list-item-title>
+              </v-list-item>
+              <v-divider></v-divider>
+              <v-list-item @click="logout">
+                <v-list-item-content>
+                  <v-list-item-title>تسجيل خروج</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </v-col>
+      </v-row>
+    </div>
+  </v-app-bar>
 </template>
-
 
 <script>
 export default {
@@ -75,15 +70,15 @@ export default {
   },
   data() {
     return {
-      user:{
-        centerName:null,
+      user: {
+        centerName: null,
       },
       searchTerm: "",
       authUser: {
         avatar: this.GetPhoto(),
       },
-        initials: "A",
-   
+      initials: "A",
+
       items: [
         { icon: "person", text: "الملف الشخصي", link: "/profile" },
         {
@@ -114,7 +109,7 @@ export default {
     },
 
     GetPhoto() {
-      return null
+      return null;
       // return "/api/profile/UserPhoto";
     },
   },
