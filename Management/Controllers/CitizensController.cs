@@ -1,8 +1,10 @@
 ﻿using Common;
+using Management.Services;
 using Management.ViewModels;
 using Managment.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Models;
 using Serilog;
 using System;
@@ -16,15 +18,14 @@ namespace Management.Controllers
 {
     
         [Route("api/[controller]")]
-        [ApiController]
         public class CitizensController : RootController
         {
-            private readonly NCDCContext db;
+        private readonly ILogger<CitizensController> logger;
 
-            public CitizensController(NCDCContext context) : base(context)
+        public CitizensController(NCDCContext context, ILogger<CitizensController> logger) : base(context)
             {
-                db = context;
-            }
+            this.logger = logger;
+        }
 
 
         [HttpGet("GetCitizens")]
@@ -81,11 +82,11 @@ namespace Management.Controllers
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "API ==>  Citizens Controller - GetCitizens /" +
-                            $"UserId ==> {UserId()} /" +
-                            "Error Code ==> [919004] /" +
-                            $"Paramters ==> pageNo = {pageNo} , pageSize= {pageSize} , searchByName = {searchByName} , NationalityNum = { NationalityNum}");
-                return StatusCode(500, new { statusCode = 919004, result = errorMsg });
+                var log = Logging.CreateLog("EX0003", HttpContext);
+
+                logger.LogCritical(ex, "{@errorCode} {@method} {@path} {@queryString} {@userName}",
+                                        log.ErrorCode, log.Method, log.Path, log.QueryString, log.UserName);
+                return StatusCode(500, new { statusCode = log.ErrorCode, message = AppMessages.ServerError });
             }
         }
 
@@ -158,16 +159,15 @@ namespace Management.Controllers
 
             return Ok(new { StatusCode = 0, result = new { message = "تم إضافة تسجيل المواطن بنجاح", addedCitizen } });
         }
-        catch (Exception ex)
-        {
-            Log.Fatal(ex, "API ==>  Citizens Controller - AddCitizen /" +
-                        $"UserId ==> {UserId()} /" +
-                        "Error Code ==> [919013] /" +
-                        $"Paramters ==> {ObjectLog.PrintPropreties(CitizenInfo)}");
+            catch (Exception ex)
+            {
+                var log = Logging.CreateLog("EX0503", HttpContext);
 
-            return StatusCode(500, new { statusCode = 919013, result = errorMsg });
+                logger.LogCritical(ex, "{@errorCode} {@method} {@path} {@queryString} {@userName}",
+                                        log.ErrorCode, log.Method, log.Path, log.QueryString, log.UserName);
+                return StatusCode(500, new { statusCode = log.ErrorCode, message = AppMessages.ServerError });
+            }
         }
-    }
         [HttpGet("GetCitizenForEdit")]
         public async Task<IActionResult> GetCitizenForEdit(int citizenId)
         {
@@ -187,13 +187,13 @@ namespace Management.Controllers
                 return Ok(new { statusCode = 0, result = new { citizenInfo } });
 
             }
-            catch (Exception ex)
+        catch (Exception ex)
             {
-                Log.Fatal(ex, "API ==> Citizens Controller - GetCitizenForEdit  /" +
-                                       $"UserId ==> {UserId()} /" +
-                                       "Error Code ==> [919048] /" +
-                                       $"Paramters ==> citizenId = {citizenId}");
-                return StatusCode(500, new { statusCode = 919048, result = errorMsg });
+                var log = Logging.CreateLog("EX0503", HttpContext);
+
+                logger.LogCritical(ex, "{@errorCode} {@method} {@path} {@queryString} {@userName}",
+                                        log.ErrorCode, log.Method, log.Path, log.QueryString, log.UserName);
+                return StatusCode(500, new { statusCode = log.ErrorCode, message = AppMessages.ServerError });
             }
         }
 
@@ -259,11 +259,11 @@ namespace Management.Controllers
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "API ==>  Citizens Controller - EditCitizen /" +
-                            $"UserId ==> {UserId()} /" +
-                            "Error Code ==> [919027] /" +
-                            $"Paramters ==> {ObjectLog.PrintPropreties(CitizenInfo)}");
-                return StatusCode(500, new { statusCode = 919027, result = errorMsg });
+                var log = Logging.CreateLog("EX0503", HttpContext);
+
+                logger.LogCritical(ex, "{@errorCode} {@method} {@path} {@queryString} {@userName}",
+                                        log.ErrorCode, log.Method, log.Path, log.QueryString, log.UserName);
+                return StatusCode(500, new { statusCode = log.ErrorCode, message = AppMessages.ServerError });
             }
         }
 
@@ -306,11 +306,11 @@ namespace Management.Controllers
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "API ==> Citizens Controller - LockCitizen  /" +
-                                $"UserId ==> {UserId()} /" +
-                                "Error Code ==> [919032] /" +
-                                $"Paramters ==> citizenId = {citizenId}");
-                return StatusCode(500, new { statusCode = 919032, result = errorMsg });
+                var log = Logging.CreateLog("EX0503", HttpContext);
+
+                logger.LogCritical(ex, "{@errorCode} {@method} {@path} {@queryString} {@userName}",
+                                        log.ErrorCode, log.Method, log.Path, log.QueryString, log.UserName);
+                return StatusCode(500, new { statusCode = log.ErrorCode, message = AppMessages.ServerError });
             }
         }
 
@@ -354,11 +354,11 @@ namespace Management.Controllers
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "API ==> Citizens Controller - UnlockCitizen  /" +
-                                $"UserId ==> {UserId()} /" +
-                                "Error Code ==> [919037] /" +
-                                $"Paramters ==> citizenId = {citizenId}");
-                return StatusCode(500, new { statusCode = 919037, result = errorMsg });
+                var log = Logging.CreateLog("EX0503", HttpContext);
+
+                logger.LogCritical(ex, "{@errorCode} {@method} {@path} {@queryString} {@userName}",
+                                        log.ErrorCode, log.Method, log.Path, log.QueryString, log.UserName);
+                return StatusCode(500, new { statusCode = log.ErrorCode, message = AppMessages.ServerError });
             }
         }
 
@@ -400,11 +400,11 @@ namespace Management.Controllers
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "API ==> Citizens Controller - DeleteCitizen  /" +
-                                $"UserId ==> {UserId()} /" +
-                                "Error Code ==> [919042] /" +
-                                $"Paramters ==> citizenId = {citizenId}");
-                return StatusCode(500, new { statusCode = 919042, result = errorMsg });
+                var log = Logging.CreateLog("EX0503", HttpContext);
+
+                logger.LogCritical(ex, "{@errorCode} {@method} {@path} {@queryString} {@userName}",
+                                        log.ErrorCode, log.Method, log.Path, log.QueryString, log.UserName);
+                return StatusCode(500, new { statusCode = log.ErrorCode, message = AppMessages.ServerError });
             }
         }
 

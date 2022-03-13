@@ -1,0 +1,53 @@
+<AppPageContainer title="انواع التحاليل" :subtitle="subtitle">
+  <div v-if="view === 0">
+
+    <div class="card-area">
+      <v-card flat class="py-4">
+
+        <v-row class="mx-4">
+          <v-spacer />
+          <v-col class="text-end">
+            <v-btn color="primary" depressed @click="addItem">إضافة تحليل</v-btn>
+          </v-col>
+        </v-row>
+
+        <ValidationObserver v-slot="{ handleSubmit }">
+          <form @submit.prevent="handleSubmit(getAll)">
+            <v-row class="mx-2" align="center">
+              <AppFormField label=" اسم التحليل" v-model="filters.search" @change="getAll" />
+              <v-col cols="1">
+                <v-btn type="submit" depressed color="primary">بحث</v-btn>
+              </v-col>
+            </v-row>
+          </form>
+        </ValidationObserver>
+        <v-container fluid>
+
+          <v-data-table :headers="headers" :items="analysisTypes" disable-pagination hide-default-footer>
+            <template v-slot:item.status="{ item }">
+              {{ item.status | status }}
+            </template>
+           
+            <template v-slot:item.actions="{ item }">
+              <AppIconTooltip tooltip="عرض التفاصيل" icon="mdi-eye-outline" @click="showDetails(item)"/>
+              <AppIconTooltip tooltip="تعديل" icon="mdi-pencil-outline" @click="editItem(item)" />
+              <AppIconTooltip tooltip="حذف" icon="mdi-delete-outline" @click="showDialog(item, 'delete')" />
+              <AppIconTooltip tooltip="تجميد" icon="mdi-lock" @click="showDialog(item, 'lock')" v-if="item.status === $status.active " />
+              <AppIconTooltip tooltip="نتائج" icon="mdi-text-box-plus-outline" @click="showResult(item)" v-if="item.status === $status.active " />
+            </template>
+          </v-data-table>
+        </v-container>
+        <div class="d-flex justify-center">
+          <v-pagination circle v-model="filters.page" :length="pageCount" @input="getAll" total-visible="5" class="pt-4"
+            prev-icon="mdi-arrow-left" next-icon="mdi-arrow-right" />
+        </div>
+      </v-card>
+    </div>
+    <AppDialog :isShown="dialog" :message="dialogMessage" @cancel="cancelDialog" @confirm="confirmDialog" />
+  </div>
+
+  <AddView v-if="view === 1" @back="back" />
+  <EditView v-if="view === 2" @back="back" :itemId="itemId" />
+  <DetailsView v-if="view === 3" @back="back" :itemId="itemId" />
+  <ResultView v-if="view === 4" @back="back" :itemId="itemId" />
+</AppPageContainer>

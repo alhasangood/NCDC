@@ -1,0 +1,44 @@
+﻿<div>
+  <div class="card-area">
+    <ValidationObserver v-slot="{ handleSubmit}">
+      <form @submit.prevent="handleSubmit(confirm)">
+        <v-card flat class="px-4 pb-4">
+          <v-toolbar flat class="mb-2">
+            <v-spacer />
+            <v-btn color="primary" depressed @click="$emit('back')">عودة</v-btn>
+          </v-toolbar>
+
+          <v-row align="center">
+            <AppFormField
+              label="اسم التحليل"
+              v-model="analysisType.analysisTypeName"
+              rules="required|max:150" :counter="150"
+            />
+            <AppFormField
+              label="رمز التحليل"
+              v-model="analysisType.analysisTypeCode"
+              rules="required|max:150" :counter="150"
+            />
+          </v-row>
+          <v-row>
+            <AppTextArea
+            :md="12"
+              label="وصف التحليل"
+              v-model="analysisType.description"
+              rules="required|max:200" :counter="200"
+            />
+       
+          </v-row>
+        <!-- </v-card>
+   
+        <v-card flat class="px-4 py-1 mt-6"> -->
+          <v-row>
+            <v-col class="text-end">
+              <v-btn type="submit" color="primary">حفظ</v-btn>
+            </v-col>
+          </v-row>
+        </v-card>
+      </form>
+    </ValidationObserver>
+  </div>
+</div>

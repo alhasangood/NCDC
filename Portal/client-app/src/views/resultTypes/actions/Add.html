@@ -1,0 +1,27 @@
+﻿<div>
+  <div class="card-area">
+    <ValidationObserver v-slot="{ handleSubmit}">
+      <form @submit.prevent="handleSubmit(confirm)">
+        <v-card flat class="px-4 pb-4">
+          <v-toolbar flat class="mb-2">
+            <v-spacer />
+            <v-btn color="primary" depressed @click="$emit('back')">عودة</v-btn>
+          </v-toolbar>
+          <v-row align="center">
+            <AppFormField label="الاسم " v-model="resultType.resultTypeName" rules="required|resultTypename|max:50"
+              :counter="50" />
+          </v-row>
+          <!-- <v-row>
+            <AppTextArea :md="12" label="وصف " v-model="resultType.description" rules="required|max:200"
+              :counter="200" />
+          </v-row> -->
+        <v-row>
+          <v-col class="text-end">
+            <v-btn type="submit" color="primary">حفظ</v-btn>
+          </v-col>
+        </v-row>
+        </v-card>
+      </form>
+    </ValidationObserver>
+  </div>
+</div>

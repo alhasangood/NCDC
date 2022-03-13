@@ -1,7 +1,12 @@
 ﻿using Common;
+using FluentEmail.Core;
+using Management.Services;
 using Management.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Models;
 using Serilog;
 using System;
@@ -12,581 +17,615 @@ using System.Threading.Tasks;
 namespace Managment.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
     public class UsersController : RootController
     {
-        private readonly NCDCContext db;
+        private readonly ILogger<UsersController> logger;
+        private readonly IFluentEmail email;
+        private readonly IConfiguration configuration;
+        private string path;
 
-        public UsersController(NCDCContext context) : base(context)
+        public UsersController(NCDCContext context, IFluentEmail email, ILogger<UsersController> logger, IConfiguration configuration) : base(context)
         {
-            db = context;
+            this.logger = logger;
+            this.email = email;
+            this.configuration = configuration;
+            path = $"{this.configuration["Settings:Domain"].ToString()}{"/img/nccp.svg"}";
         }
 
-
-        [HttpGet("GetUsers")]
-        public async Task<IActionResult> GetUsers(int pageNo, int pageSize, string searchByName)
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> Get([FromQuery] Pagination pagination, [FromQuery] UsersFilterVM filter)
         {
             try
             {
-                //if (!GetUserPermission("09000"))
-                //{
-                //    return BadRequest(new { StatusCode = 919001, result = noPermission });
-                //}
+                if (!HasPermission("05000")) return BadRequest(new { statusCode = "AE0501", message = AppMessages.noPermission });
+                var query = from c in db.Users.Where(p => p.Status != Status.Deleted)
+                                    .WhereIf(filter.Search is not null, u => u.LoginName.Contains(filter.Search))
+                            orderby c.CreatedOn descending
+                            select new UsersListVM
+                            {
+                                CreatedBy = c.CreatedByNavigation.FullName,
+                                CreatedOn = c.CreatedOn.ToString("yyyy/MM/dd"),
+                                LoginName = c.LoginName,
+                                Status = c.Status,
+                                //UserId = c.UserId,/
+                            //    JobDescription = c.JobDescription,
+                                //ParentCenter = c.UserType == UserTypes.RegionUser ? c.RegionCenter.RegionsCenterName
+                                //    : c.UserType == UserTypes.HealthUser ? c.HealthCenter.HealthCenterName
+                                //    : "لا يوجد",
+                                //UserType = c.UserType
+                            };
 
-                if (pageNo <= 0)
-                {
-                    return BadRequest(new { StatusCode = 919002, result = "يرجي التأكد من البيانات" });
-                }
-                if (pageSize <= 0)
-                {
-                    return BadRequest(new { StatusCode = 919003, result = "يرجي التأكد من البيانات" });
-                }
+                var totalItems = await query.CountAsync();
+                var users = await query.Skip(pagination.PageSize * (pagination.Page - 1)).Take(pagination.PageSize).ToListAsync();
+                var result = new { statusCode = 1, users, totalItems };
 
-                var UsersQuery = from a in db.Users
-                                 where a.Status != Status.Deleted
-                                 select a;
-
-                if (!String.IsNullOrWhiteSpace(searchByName))
-                {
-                    UsersQuery = from a in UsersQuery
-                                 where a.FullName.Contains(searchByName)
-                                 select a;
-                }
-
-                var Users = await (from a in UsersQuery
-                                   orderby a.UserId descending
-                                   select new
-                                   {
-                                       a.UserId,
-                                       a.LoginName,
-                                       a.FullName,
-                                         a.CreatedOn,
-                                       a.Status
-                                   }).Skip((pageNo - 1) * pageSize).Take(pageSize).ToListAsync();
-
-                var totalItems = await UsersQuery.CountAsync();
-
-                return Ok(new { StatusCode = 0, result = new { Users, totalItems } });
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "API ==>  Users Controller - GetUsers /" +
-                            $"UserId ==> {UserId()} /" +
-                            "Error Code ==> [919004] /" +
-                            $"Paramters ==> pageNo = {pageNo} , pageSize= {pageSize} , searchByName = {searchByName}");
-                return StatusCode(500, new { statusCode = 919004, result = errorMsg });
+                var log = Logging.CreateLog("EX0501", HttpContext);
+
+                logger.LogCritical(ex, "{@errorCode} {@method} {@path} {@queryString} {@userName}",
+                                        log.ErrorCode, log.Method, log.Path, log.QueryString, log.UserName);
+                return StatusCode(500, new { statusCode = log.ErrorCode, message = AppMessages.ServerError });
             }
         }
 
-        [HttpPost("AddUser")]
-        public async Task<IActionResult> AddUser([FromBody] UserData userInfo)
+        [AllowAnonymous]
+        [HttpGet("{id}/details")]
+        public async Task<IActionResult> GetDetails(int id)
         {
             try
             {
-                //if (!GetUserPermission("09001"))
-                //{
-                //    return BadRequest(new { StatusCode = 919005, result =noPermission });
-                //}
+                if (!HasPermission("05003")) return BadRequest(new { statusCode = "AE0502", message = AppMessages.noPermission });
 
-                if (string.IsNullOrWhiteSpace(userInfo.FullName))
-                {
-                    return BadRequest(new { statusCode = 919006, result = "الرجاء التأكد من ادخال اسم المستخدم" });
+                //var user = await (from c in db.Users
+                //                  where c.UserId == id
+                //                  && c.Status != Status.Deleted
+                //                  select new UserDetailsVM
+                //                  {
+                //                      CreatedBy = c.CreatedByNavigation.FullName,
+                //                      CreatedOn = c.CreatedOn.ToString("yyyy/MM/dd"),
+                //                      Email = c.Email,
+                //                      FullName = c.FullName,
+                //                      LoginName = c.LoginName,
+                //                      PhoneNo = c.PhoneNo,
+                //                      Status = c.Status,
+                //                      UpdatedBy = c.UpdatedByNavigation.FullName,
+                //                      UpdatedOn = c.UpdatedOn.Value.ToString("yyyy/MM/dd"),
+                //                      JobDescription = c.JobDescription,
+                //                      UserType = c.UserType,
+                //                      ParentCenter = c.UserType == UserTypes.RegionUser ? c.RegionCenter.RegionsCenterName
+                //                    : c.UserType == UserTypes.HealthUser ? c.HealthCenter.HealthCenterName
+                //                    : "",
+                //                      Features = (from f in db.Features
+                //                                  where f.Status != Status.Deleted
+                //                                  select new Features
+                //                                  {
+                //                                      FeatureId = f.FeatureId,
+                //                                      FeatureName = f.FeatureName,
+                //                                      Permissions = (from o in db.UserPermissions
+                //                                                     where o.UserId == id
+                //                                                     && o.Permission.FeatureId == f.FeatureId
+                //                                                     select new Permissions
+                //                                                     {
+                //                                                         PermissionId = o.PermissionId,
+                //                                                         PermissionName = o.Permission.PermissionName
+                //                                                     }).ToList(),
+                //                                  }).Where(x => x.Permissions.Count > 0).ToList(),
+                //                  }).SingleOrDefaultAsync();
+                var user = await (from c in db.Users
+                                  where c.UserId == id
+                                  && c.Status != Status.Deleted
+                                  select new UserDetailsVM
+                                  {
+                                      CreatedBy = c.CreatedByNavigation.FullName,
+                                      CreatedOn = c.CreatedOn.ToString("yyyy/MM/dd"),
+                                      Email = c.Email,
+                                      FullName = c.FullName,
+                                      LoginName = c.LoginName,
+                                      PhoneNo = c.PhoneNo,
+                                  }).SingleOrDefaultAsync();
+                if (user is null) return NotFound(new { statusCode = "RE0501", message = "لم يتم العثور على بيانات المستخدم" });
 
-                }
-                if (userInfo.FullName.Length > 50)
-                {
-                    return BadRequest(new { statusCode = 919007, result = "الرجاء ادخال اسم مستخدم لا يتجاوز 50 حرف" });
-                }
-                if (string.IsNullOrWhiteSpace(userInfo.LoginName))
-                {
+                var result = new { statusCode = 1, user };
 
-                    return BadRequest(new { statusCode = 919008, result = "الرجاء التأكد من ادخال اسم الدخول" });
-                }
-                else if (userInfo.LoginName.Length > 30)
-                {
-                    return BadRequest(new { statusCode = 919009, result = "الرجاء ادخال اسم دخول لا يتجاوز 30 حرف" });
-                }
-                if (!String.IsNullOrWhiteSpace(userInfo.MobileNo))
-                {
-                    if (userInfo.MobileNo.Length < 9 || userInfo.MobileNo.Length > 10)
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                var log = Logging.CreateLog("EX0502", HttpContext);
+                logger.LogCritical(ex, "{@errorCode} {@method} {@path} {@queryString} {@userName}",
+                                        log.ErrorCode, log.Method, log.Path, log.QueryString, log.UserName);
+                return StatusCode(500, new { statusCode = log.ErrorCode, message = AppMessages.ServerError });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Add([FromBody] UserVM dataVM)
+        {
+            try
+            {
+                if (!HasPermission("05001")) return BadRequest(new { statusCode = "AE0503", message = AppMessages.noPermission });
+                var dublicateName = await (from c in db.Users
+                                           where c.LoginName == dataVM.LoginName
+                                           && c.Status != Status.Deleted
+                                           select c).AnyAsync();
+                if (dublicateName) return BadRequest(new { StatusCode = "RE0502", message = "لا يمكن تخزين اسم مستخدم مسجل مسبقا" });
+
+
+                var newuser = mapper.Map<User>(dataVM);
+
+                newuser.CreatedBy = UserId();
+                Guid randomGuid = Guid.NewGuid();
+                int x = randomGuid.ToString().IndexOf("-");
+                string password = randomGuid.ToString().Substring(0, x);
+                newuser.Password = Security.ComputeHash(password, Security.Base64Decode("QXJAcUBUZWNoMjAxOCE="));
+
+                db.Users.Add(newuser);
+
+                dataVM.Permissions.ForEach(x => {
+                    var UserPermission = new UserPermission
                     {
-                        return BadRequest(new { statusCode = 919010, result = "الرجاء ادخال رقم الهاتف بصيغة 9 أو 10 أرقام" });
-                    }
-                }
-
-                if (!String.IsNullOrWhiteSpace(userInfo.JobDesc))
-                {
-                    if (userInfo.JobDesc.Length > 50)
-                    {
-                        return BadRequest(new { statusCode = 919011, result = "الرجاء ادخال صفة لا يتجاوز 50 حرف" });
-                    }
-                }
-
-                var checkLoginName = await (from a in db.Users
-                                            where a.LoginName == userInfo.LoginName
-                                            && a.Status != Status.Deleted
-                                            select a).CountAsync();
-
-                if (checkLoginName > 0)
-                {
-                    return BadRequest(new { statusCode = 919012, result = "اسم الدخول مستخدم مسبقا الرجاء ادخال اسم دخول اخر" });
-                }
-                //var randomGuid = Guid.NewGuid();
-                //int x = randomGuid.ToString().IndexOf("-");
-                //string password = randomGuid.ToString().Substring(0, x);
-
-                Users addUser = new Users()
-                {
-                    FullName = userInfo.FullName,
-                     LoginName = userInfo.LoginName,
-                     Email = userInfo.Email,
-                    Password = Security.ComputeHash(userInfo.Password, HashAlgorithms.SHA512, null),
-                    LoginTryAttempts = 0,
-                    CreatedBy = UserId(),
-                    CreatedOn = DateTime.Now,
-                    Status = Status.Active
-                };
-                await db.Users.AddAsync(addUser);
-
-
-                foreach (var permission in userInfo.SelectedPermissions)
-                {
-                    UserPermissions newPermission = new UserPermissions()
-                    {
-                        UserId = addUser.UserId,
-                        PermissionId = permission,
                         CreatedBy = UserId(),
+                        UserId = newuser.UserId,
                         CreatedOn = DateTime.Now,
+                        PermissionId = x
                     };
-                    addUser.UserPermissionsUser.Add(newPermission);
+
+                    newuser.UserPermissionUsers.Add(UserPermission);
+                });
+
+
+                for (var attempts = 0; attempts < 3; attempts++)
+                {
+
+                    var sendingEmail = await email.To($"{newuser.Email}").Subject("اعادة تعيين كلمة المرور الخاصة بحسابك")
+                          .Body(BodyEmail("كلمة المرور الخاصة بحسابك", newuser.LoginName, password), true).SendAsync();
+
+                    if (sendingEmail.Successful) break;
+                    else if (!sendingEmail.Successful && attempts < 2)
+                    {
+                        var ex = string.Join(",", sendingEmail.ErrorMessages);
+                        var log = Logging.CreateLog("EX0502", HttpContext);
+                        logger.LogCritical(ex, "{@errorCode} {@method} {@path} {@queryString} {@userName}",
+                                                log.ErrorCode, log.Method, log.Path, log.QueryString, log.UserName);
+                    }
+                    else if (!sendingEmail.Successful && attempts == 2)
+                    {
+                        var ex = string.Join(",", sendingEmail.ErrorMessages);
+                        var log = Logging.CreateLog("EX0502", HttpContext);
+
+                        logger.LogCritical(ex, "{@errorCode} {@method} {@path} {@queryString} {@userName}",
+                                                log.ErrorCode, log.Method, log.Path, log.QueryString, log.UserName);
+                        return BadRequest(new { statusCode = "RE0502", message = "لم تنجح عملية ارسال كلمة المرور عبر البريد الكتروني" });
+                    }
                 }
                 await db.SaveChangesAsync();
 
-                var addedUser = await (from a in db.Users
-                                       where a.UserId == addUser.UserId
-                                       select new
-                                       {
-                                           a.UserId,
-                                           a.LoginName,
-                                           a.FullName,
-                                           a.CreatedOn,
-                                           a.Status
-                                       }).SingleOrDefaultAsync();
 
-                return Ok(new { StatusCode = 0, result = new { message = "تم إضافة المستخدم بنجاح", addedUser } });
+                var user = await (from c in db.Users
+                                  where c.UserId == newuser.UserId
+                                  select new UsersListVM
+                                  {
+                                      CreatedBy = c.CreatedByNavigation.FullName,
+                                      CreatedOn = c.CreatedOn.ToString("yyyy/MM/dd"),
+                                      LoginName = c.LoginName,
+                                      Status = c.Status,
+                                      UserId = c.UserId,
+                                      JobDescription = c.JobDescription,
+                                      ParentCenter = c.UserType == UserTypes.RegionUser ? c.RegionCenter.RegionsCenterName
+                                    : c.UserType == UserTypes.HealthUser ? c.HealthCenter.HealthCenterName
+                                    : "لا يوجد",
+                                      UserType = c.UserType
+                                  }).SingleOrDefaultAsync();
+                var result = new { statusCode = 1, user, message = "تم إضافة المستخدم بنجاح" };
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "API ==>  Users Controller - AddUser /" +
-                            $"UserId ==> {UserId()} /" +
-                            "Error Code ==> [919013] /" +
-                            $"Paramters ==> {ObjectLog.PrintPropreties(userInfo)}");
+                var log = Logging.CreateLog("EX0503", HttpContext);
 
-                return StatusCode(500, new { statusCode = 919013, result = errorMsg });
+                logger.LogCritical(ex, "{@errorCode} {@method} {@path} {@queryString} {@userName}",
+                                        log.ErrorCode, log.Method, log.Path, log.QueryString, log.UserName);
+                return StatusCode(500, new { statusCode = log.ErrorCode, message = AppMessages.ServerError });
             }
         }
 
-        [HttpGet("GetUserForView")]
-        public async Task<IActionResult> GetUserForView(int userId)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(int id)
         {
             try
             {
-                if (userId <= 0)
-                {
-                    return BadRequest(new { statusCode = 919014, result = "الرجاء التأكد من اختيار مستخدم" });
-                }
-                //if (!GetUserPermission("09002"))
-                //{
-                //    return BadRequest(new { statusCode = 919015, result = "ليس لديك الصلاحيات اللازمة لتنفيذ الامر" });
-                //}
+                if (!HasPermission("05002")) return BadRequest(new { statusCode = "AE0504", message = AppMessages.noPermission });
 
+                var user = await (from c in db.Users
+                                  where c.UserId == id
+                                  && c.Status != Status.Deleted
+                                  select new UserVM
+                                  {
+                                      LoginName = c.LoginName,
+                                      FullName = c.FullName,
+                                      PhoneNo = c.PhoneNo,
+                                      Email = c.Email,
+                                      JobDescription = c.JobDescription,
+                                      HealthCenterId = c.HealthCenterId,
+                                      RegionCenterId = c.RegionCenterId,
+                                      UserType = c.UserType,
+                                      Permissions = c.UserPermissionUsers.Select(x => x.PermissionId).ToList(),
+                                  }).SingleOrDefaultAsync();
 
-                var userInfo = await (from a in db.Users
-                                      where a.UserId == userId
-                                      && a.Status != Status.Deleted
-                                      select new
-                                      {
-                                          a.UserId,
-                                          a.LoginName,
-                                          a.FullName,
-                                          a.Email,
-                                          selectedPermissions = (from f in db.Features
-                                                                 join p in db.UserPermissions on f.FeatureId equals p.Permission.FeatureId
-                                                                 where f.FeatureType == 1
-                                                                 && p.UserId == userId
-                                                                 select new
-                                                                 {
-                                                                     f.FeatureId,
-                                                                     f.FeatureName,
-                                                                     permissions = (from a in db.UserPermissions
-                                                                                    where a.UserId == userId
-                                                                                    && a.Permission.FeatureId == f.FeatureId
-                                                                                    select a.Permission.PermissionName).ToList()
-                                                                 }).Distinct().ToList(),
+                if (user is null) return NotFound(new { statusCode = "RE0503", message = "لم يتم العثور على المستخدم" });
 
-                                      }).SingleOrDefaultAsync();
+                var result = new { statusCode = 1, user };
 
-                if (userInfo == null)
-                {
-                    return BadRequest(new { statusCode = 919016, result = "لم يتم العثور على هذا المستخدم" });
-                }
-
-                return Ok(new { statusCode = 0, result = new { userInfo } });
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "API ==> Users Controller - GetUserForView  /" +
-                                $"UserId ==> {UserId()} /" +
-                                "Error Code ==> [919017] /" +
-                                $"Paramters ==> UserId = {userId}");
-                return StatusCode(500, new { statusCode = 919017, result = errorMsg });
+                var log = Logging.CreateLog("EX0504", HttpContext);
+
+                logger.LogCritical(ex, "{@errorCode} {@method} {@path} {@queryString} {@userName}",
+                                        log.ErrorCode, log.Method, log.Path, log.QueryString, log.UserName);
+                return StatusCode(500, new { statusCode = log.ErrorCode, message = AppMessages.ServerError });
             }
         }
 
-        [HttpGet("GetUserForEdit")]
-        public async Task<IActionResult> GetUserForEdit(int userId)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Edit(int id, [FromBody] UserVM dataVM)
         {
             try
             {
+                if (!HasPermission("05002")) return BadRequest(new { statusCode = "AE0505", message = AppMessages.noPermission });
+                var dublicateName = await (from c in db.Users
+                                           where c.LoginName == dataVM.LoginName
+                                           && c.Status != Status.Deleted
+                                           && c.UserId != id
+                                           select c).AnyAsync();
 
+                if (dublicateName) return BadRequest(new { StatusCode = "RE0504", message = "لا يمكن تخزين اسم مستخدم مسجل مسبقا" });
 
-                if (userId < 0)
+                var edituser = await (from c in db.Users
+                                       .Include(x => x.UserPermissionUsers)
+                                      where c.UserId == id
+                                         && c.Status != Status.Deleted
+                                      select c).SingleOrDefaultAsync();
+
+                if (edituser is null) return BadRequest(new { StatusCode = "RE0505", message = "لا توجد بيانات" });
+                mapper.Map(dataVM, edituser);
+                edituser.HealthCenterId = dataVM.UserType is UserTypes.RegionUser or UserTypes.Manager ? null : dataVM.HealthCenterId;
+                edituser.RegionCenterId = dataVM.UserType is UserTypes.HealthUser or UserTypes.Manager ? null : dataVM.RegionCenterId;
+                edituser.UpdatedBy = UserId();
+
+                foreach (var permission in edituser.UserPermissionUsers)
                 {
-                    return BadRequest(new { StatusCode = 919047, result = "يرجي التأكد من بيانات المستخدم." });
-                }
-                var userInfo = await (from a in db.Users
-                                      where a.UserId == userId
-                                         && a.Status != Status.Deleted
-                                      select new
-                                      {
-                                          a.UserId,
-                                          a.LoginName,
-                                          a.FullName,
-                                          a.Email,
-                                          selectedUserPermissions = (from p in db.UserPermissions
-                                                                     where p.UserId == userId
-                                                                     join u in db.UserPermissions.Where(z => z.UserId == UserId()) on p.PermissionId equals u.PermissionId
-                                                                     select p.PermissionId).ToList()
-                                      }).SingleOrDefaultAsync();
-
-                return Ok(new { statusCode = 0, result = new { userInfo } });
-
-            }
-            catch (Exception ex)
-            {
-                Log.Fatal(ex, "API ==> Users Controller - GetUserForEdit  /" +
-                                       $"UserId ==> {UserId()} /" +
-                                       "Error Code ==> [919048] /" +
-                                       $"Paramters ==> UserId = {userId}");
-                return StatusCode(500, new { statusCode = 919048, result = errorMsg });
-            }
-        }
-
-        [HttpPut("EditrUser")]
-        public async Task<IActionResult> EditUser([FromBody] UserData userInfo)
-        {
-            try
-            {
-
-                //if (!GetUserPermission("09003"))
-                //{
-                //    return BadRequest(new { StatusCode = 919018, result =noPermission });
-                //}
-                if (userInfo.UserId <= 0)
-                {
-                    return BadRequest(new { StatusCode = 919019, result = "يرجي اختيار المستخدم." });
+                    db.UserPermissions.Remove(permission);
                 }
 
-                if (string.IsNullOrWhiteSpace(userInfo.FullName))
-                {
-                    return BadRequest(new { statusCode = 919006, result = "الرجاء التأكد من ادخال اسم المستخدم" });
 
-                }
-                if (userInfo.FullName.Length > 50)
-                {
-                    return BadRequest(new { statusCode = 919007, result = "الرجاء ادخال اسم مستخدم لا يتجاوز 50 حرف" });
-                }
-                if (string.IsNullOrWhiteSpace(userInfo.LoginName))
-                {
 
-                    return BadRequest(new { statusCode = 919008, result = "الرجاء التأكد من ادخال اسم الدخول" });
-                }
-                else if (userInfo.LoginName.Length > 30)
-                {
-                    return BadRequest(new { statusCode = 919009, result = "الرجاء ادخال اسم دخول لا يتجاوز 30 حرف" });
-                }
-                if (!String.IsNullOrWhiteSpace(userInfo.MobileNo))
-                {
-                    if (userInfo.MobileNo.Length < 9 || userInfo.MobileNo.Length > 10)
+                dataVM.Permissions.ForEach(x => {
+
+                    var UserPermission = new UserPermission
                     {
-                        return BadRequest(new { statusCode = 919010, result = "الرجاء ادخال رقم الهاتف بصيغة 9 أو 10 أرقام" });
-                    }
-                }
-
-                if (!String.IsNullOrWhiteSpace(userInfo.JobDesc))
-                {
-                    if (userInfo.JobDesc.Length > 50)
-                    {
-                        return BadRequest(new { statusCode = 919011, result = "الرجاء ادخال صفة لا يتجاوز 50 حرف" });
-                    }
-                }
-
-                var checkLoginName = await (from a in db.Users
-                                            where a.LoginName == userInfo.LoginName
-                                            && a.Status != Status.Deleted
-                                            select a).CountAsync();
-
-                if (checkLoginName > 0)
-                {
-                    return BadRequest(new { statusCode = 919012, result = "اسم الدخول مستخدم مسبقا الرجاء ادخال اسم دخول اخر" });
-                }
-
-                var userData = await (from a in db.Users
-                                      where a.UserId == userInfo.UserId
-                                      select a).SingleOrDefaultAsync();
-
-                if (userData == null)
-                {
-                    return BadRequest(new { statusCode = 919030, result = "لم يتم العثور على المستخدم" });
-                }
-
-                userData.FullName = userInfo.FullName;
-                userData.LoginName = userInfo.LoginName;
-
-                userData.ModifiedBy = UserId();
-                userData.ModifiedOn = DateTime.Now;
-
-
-                var oldPermissions = await (from a in db.UserPermissions
-                                            where a.UserId == userInfo.UserId
-                                            select a.PermissionId).ToListAsync();
-                foreach (int permission in oldPermissions)
-                {
-                    if (userInfo.SelectedPermissions.Contains(permission))
-                    {
-                        userInfo.SelectedPermissions.RemoveAll(x => x == permission);
-                    }
-                    else
-                    {
-                        var removePermission = await (from p in db.UserPermissions
-                                                      where p.PermissionId == permission
-                                                      && p.UserId == userInfo.UserId
-                                                      select p).SingleOrDefaultAsync();
-                        db.UserPermissions.Remove(removePermission);
-                    }
-                }
-
-                foreach (int permission in userInfo.SelectedPermissions)
-                {
-                    UserPermissions newPermission = new UserPermissions()
-                    {
-                        UserId = userData.UserId,
-                        PermissionId = permission,
                         CreatedBy = UserId(),
-                        CreatedOn = DateTime.Now
+                        UserId = id,
+                        CreatedOn = DateTime.Now,
+                        PermissionId = x
                     };
-                    await db.UserPermissions.AddAsync(newPermission);
-                }
+                    edituser.UserPermissionUsers.Add(UserPermission);
+                });
+
 
                 await db.SaveChangesAsync();
 
-                return Ok(new { StatusCode = 0, result = new { result = "تم تعديل المستخدم بنجاح" } });
+                var user = await (from c in db.Users
+                                  where c.UserId == edituser.UserId
+                                  select new UsersListVM
+                                  {
+                                      CreatedBy = c.CreatedByNavigation.FullName,
+                                      CreatedOn = c.CreatedOn.ToString("yyyy/MM/dd"),
+                                      LoginName = c.LoginName,
+                                      Status = c.Status,
+                                      UserId = c.UserId,
+                                      JobDescription = c.JobDescription,
+                                      ParentCenter = c.UserType == UserTypes.RegionUser ? c.RegionCenter.RegionsCenterName
+                                    : c.UserType == UserTypes.HealthUser ? c.HealthCenter.HealthCenterName
+                                    : "لا يوجد",
+                                      UserType = c.UserType
+                                  }).SingleOrDefaultAsync();
+                var result = new { statusCode = 1, user, message = "تم تعديل المستخدم بنجاح" };
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "API ==>  Users Controller - EditUser /" +
-                            $"UserId ==> {UserId()} /" +
-                            "Error Code ==> [919027] /" +
-                            $"Paramters ==> {ObjectLog.PrintPropreties(userInfo)}");
-                return StatusCode(500, new { statusCode = 919027, result = errorMsg });
+                var log = Logging.CreateLog("EX0505", HttpContext);
+
+                logger.LogCritical(ex, "{@errorCode} {@method} {@path} {@queryString} {@userName}",
+                                        log.ErrorCode, log.Method, log.Path, log.QueryString, log.UserName);
+                return StatusCode(500, new { statusCode = log.ErrorCode, message = AppMessages.ServerError });
             }
         }
 
-        [HttpPut("LockUser")]
-        public async Task<IActionResult> LockUser(int userId)
+        [HttpPut("{id}/lock")]
+        public async Task<IActionResult> Lock(int id)
         {
             try
             {
-                if (userId <= 0)
-                {
-                    return BadRequest(new { statusCode = 919028, result = "الرجاء التأكد من البيانات " });
-                }
+                if (!HasPermission("05004")) return BadRequest(new { statusCode = "AE0506", message = AppMessages.noPermission });
 
-                //if (!GetUserPermission("09004"))
-                //{
-                //    return BadRequest(new { statusCode = 919029, result = "ليس لديك الصلاحيات اللازمة لتنفيذ الامر" });
-                //}
+                var user = await (from c in db.Users
+                                  where c.UserId == id
+                                  && c.Status != Status.Deleted
+                                  select c).SingleOrDefaultAsync();
 
-                var user = await (from a in db.Users
-                                  where a.UserId == userId
-                                  && a.Status != Status.Deleted
-                                  select a).SingleOrDefaultAsync();
+                if (user is null) return NotFound(new { statusCode = "RE0506", message = "لم يتم العثور على المستخدم" });
 
-                if (user == null)
-                {
-                    return BadRequest(new { statusCode = 919030, result = "لم يتم العثور على المستخدم" });
-                }
-
-                if (user.Status == Status.Locked)
-                {
-                    return BadRequest(new { statusCode = 919031, result = "تم تجميد المستخدم مسبقا" });
-                }
+                if (user.Status == Status.Locked) return NotFound(new { statusCode = "RE0507", message = "هذا المستخدم مجمد مسبقا" });
+                if (user.Status != Status.Active) return NotFound(new { statusCode = "RE0508", message = "هذا المستخدم غير مفعل" });
 
                 user.Status = Status.Locked;
-                user.ModifiedBy = UserId();
-                user.ModifiedOn = DateTime.Now;
+                user.UpdatedBy = UserId();
+                user.UpdatedOn = DateTime.Now;
+
                 await db.SaveChangesAsync();
 
-                return Ok(new { statusCode = 0, result = new { result = "تم تجميد المستخدم بنجاح" } });
+                var result = new { statusCode = 1, message = "تم تجميد المستخدم بنجاح" };
+
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "API ==> Users Controller - LockUser  /" +
-                                $"UserId ==> {UserId()} /" +
-                                "Error Code ==> [919032] /" +
-                                $"Paramters ==> UserId = {userId}");
-                return StatusCode(500, new { statusCode = 919032, result = errorMsg });
+                var log = Logging.CreateLog("EX0506", HttpContext);
+
+                logger.LogCritical(ex, "{@errorCode} {@method} {@path} {@queryString} {@userName}",
+                                        log.ErrorCode, log.Method, log.Path, log.QueryString, log.UserName);
+                return StatusCode(500, new { statusCode = log.ErrorCode, message = AppMessages.ServerError });
             }
         }
 
-        [HttpPut("UnlockUser")]
-        public async Task<IActionResult> UnlockUser(int userId)
+        [HttpPut("{id}/unlock")]
+        public async Task<IActionResult> Unlock(int id)
         {
             try
             {
-                if (userId <= 0)
-                {
-                    return BadRequest(new { statusCode = 919033, result = "الرجاء التأكد من البيانات " });
-                }
+                if (!HasPermission("05004")) return BadRequest(new { statusCode = "AE0507", message = AppMessages.noPermission });
 
-                //if (!GetUserPermission("09005"))
-                //{
-                //    return BadRequest(new { statusCode = 919034, result = "ليس لديك الصلاحيات اللازمة لتنفيذ الامر" });
-                //}
+                var user = await (from c in db.Users
+                                  where c.UserId == id
+                                  && c.Status != Status.Deleted
+                                  select c).SingleOrDefaultAsync();
 
-                var user = await (from a in db.Users
-                                  where a.UserId == userId
-                                  && a.Status != Status.Deleted
-                                  select a).SingleOrDefaultAsync();
+                if (user is null) return NotFound(new { statusCode = "RE0509", message = "لم يتم العثور على المستخدم" });
 
-                if (user == null)
-                {
-                    return BadRequest(new { statusCode = 919035, result = "لم يتم العثور على المستخدم" });
-                }
-
-                if (user.Status == Status.Active)
-                {
-                    return BadRequest(new { statusCode = 919036, result = "هذا المستخدم مفعل مسبقا" });
-                }
+                if (user.Status == Status.Active) return NotFound(new { statusCode = "RE0510", message = "هذا المستخدم مفعل مسبقا" });
 
                 user.Status = Status.Active;
-                user.ModifiedBy = UserId();
-                user.ModifiedOn = DateTime.Now;
+                user.UpdatedBy = UserId();
+                user.UpdatedOn = DateTime.Now;
+
                 await db.SaveChangesAsync();
 
-                return Ok(new { statusCode = 0, result = new { result = "تم فك تجميد المستخدم بنجاح" } });
+                var result = new { statusCode = 1, message = "تم فك تجميد المستخدم بنجاح" };
+
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "API ==> rUsers Controller - UnLockUser  /" +
-                                $"UserId ==> {UserId()} /" +
-                                "Error Code ==> [919037] /" +
-                                $"Paramters ==> UserId = {userId}");
-                return StatusCode(500, new { statusCode = 919037, result = errorMsg });
+                var log = Logging.CreateLog("EX0507", HttpContext);
+
+                logger.LogCritical(ex, "{@errorCode} {@method} {@path} {@queryString} {@userName}",
+                                        log.ErrorCode, log.Method, log.Path, log.QueryString, log.UserName);
+                return StatusCode(500, new { statusCode = log.ErrorCode, message = AppMessages.ServerError });
             }
         }
 
-        [HttpDelete("DeleteUser")]
-        public async Task<IActionResult> DeleteUser(int userId)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                if (userId <= 0)
-                {
-                    return BadRequest(new { statusCode = 919038, result = "الرجاء التأكد من البيانات " });
-                }
+                if (!HasPermission("05005")) return BadRequest(new { statusCode = "AE0508", message = AppMessages.noPermission });
 
-                //if (!GetUserPermission("09006"))
-                //{
-                //    return BadRequest(new { statusCode = 919039, result = "ليس لديك الصلاحيات اللازمة لتنفيذ الامر" });
-                //}
+                var user = await (from c in db.Users
+                                  where c.UserId == id
+                                  select c).SingleOrDefaultAsync();
 
-                var user = await (from a in db.Users
-                                  where a.UserId == userId
-                                  select a).SingleOrDefaultAsync();
+                if (user is null) return NotFound(new { statusCode = "RE0511", message = "لم يتم العثور على المستخدم" });
 
-                if (user == null)
-                {
-                    return BadRequest(new { statusCode = 919040, result = "لم يتم العثور على المستخدم" });
-                }
-
-                if (user.Status == Status.Deleted)
-                {
-                    return BadRequest(new { statusCode = 919041, result = "هذا المستخدم محذوف مسبقا" });
-                }
 
                 user.Status = Status.Deleted;
-                user.ModifiedBy = UserId();
-                user.ModifiedOn = DateTime.Now;
+                user.UpdatedBy = UserId();
+                user.UpdatedOn = DateTime.Now;
+
                 await db.SaveChangesAsync();
 
-                return Ok(new { statusCode = 0, result = new { result = "تم حذف المستخدم بنجاح" } });
+                var result = new { statusCode = 1, message = "تم حذف المستخدم بنجاح" };
+
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "API ==> Users Controller - DeleteUser  /" +
-                                $"UserId ==> {UserId()} /" +
-                                "Error Code ==> [919042] /" +
-                                $"Paramters ==> UserId = {userId}");
-                return StatusCode(500, new { statusCode = 919042, result = errorMsg });
+                var log = Logging.CreateLog("EX0508", HttpContext);
+
+                logger.LogCritical(ex, "{@errorCode} {@method} {@path} {@queryString} {@userName}",
+                                        log.ErrorCode, log.Method, log.Path, log.QueryString, log.UserName);
+                return StatusCode(500, new { statusCode = log.ErrorCode, message = AppMessages.ServerError });
             }
         }
 
-
-        [HttpGet("GetPermissions")]
-        public async Task<IActionResult> GetPermissions()
+        [HttpGet("{id}/ResetPassword")]
+        public async Task<IActionResult> ResetPassword(int id)
         {
             try
             {
+                if (!HasPermission("05007")) return BadRequest(new { statusCode = "AE0509", message = AppMessages.noPermission });
 
-                if (UserId() <= 0)
+                var user = await (from c in db.Users
+                                  where c.UserId == id
+                                  select c).SingleOrDefaultAsync();
+
+                if (user is null) return NotFound(new { statusCode = "RE0512", message = "لم يتم العثور على المستخدم" });
+
+
+                Guid randomGuid = Guid.NewGuid();
+                int x = randomGuid.ToString().IndexOf("-");
+                string password = randomGuid.ToString().Substring(0, x);
+                user.Password = Security.ComputeHash(password, Security.Base64Decode("QXJAcUBUZWNoMjAxOCE="));
+                user.UpdatedBy = UserId();
+                user.UpdatedOn = DateTime.Now;
+
+                for (var attempts = 0; attempts < 3; attempts++)
                 {
-                    return BadRequest(new { statusCode = 919038, result = "الرجاء التأكد من البيانات " });
+                    var sendingEmail = await email.To($"{user.Email}").Subject("اعادة تعيين كلمة المرور الخاصة بحسابك")
+                            .Body(BodyEmail("اعادة تعيين كلمة المرور", user.LoginName, password), true).SendAsync();
+
+
+                    if (sendingEmail.Successful) break;
+                    else if (!sendingEmail.Successful && attempts < 2)
+                    {
+                        var ex = string.Join(",", sendingEmail.ErrorMessages);
+                        var log = Logging.CreateLog("EX0509", HttpContext);
+                        logger.LogCritical(ex, "{@errorCode} {@method} {@path} {@queryString} {@userName}",
+                                                log.ErrorCode, log.Method, log.Path, log.QueryString, log.UserName);
+                    }
+                    else if (!sendingEmail.Successful && attempts == 2)
+                    {
+                        var ex = string.Join(",", sendingEmail.ErrorMessages);
+                        var log = Logging.CreateLog("EX0509", HttpContext);
+
+                        logger.LogCritical(ex, "{@errorCode} {@method} {@path} {@queryString} {@userName}",
+                                                log.ErrorCode, log.Method, log.Path, log.QueryString, log.UserName);
+                        return BadRequest(new { statusCode = "RE05012", message = "لم تنجح عملية ارسال كلمة المرور عبر البريد الكتروني" });
+                    }
                 }
 
-                var AllPermissions = await (from f in db.Features
-                                            where f.Status != Status.Deleted
-                                            && f.FeatureType == 1
-                                            select new
-                                            {
-                                                f.FeatureId,
-                                                f.FeatureName,
-                                                checkAll = false,
-                                                permissions = (from p in f.Permissions
-                                                               orderby p.Code ascending
-                                                               select new
-                                                               {
-                                                                   p.PermissionId,
-                                                                   p.PermissionName,
-                                                               }).ToList(),
-                                            }).ToListAsync();
+                await db.SaveChangesAsync();
 
+                var result = new { statusCode = 1, message = "تم ارسال كلمة المرور الجديدة الى بريد المستخدم بنجاح" };
 
-
-                return Ok(new { statusCode = 0, result = new { AllPermissions } });
-
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "API ==> Users Controller - GetPermissions  /" +
-                                       $"UserId ==> {UserId()} /" +
-                                       "Error Code ==> [919048] /" +
-                                       $"Paramters ==> UserId = {UserId()}");
-                return StatusCode(500, new { statusCode = 919048, Message = errorMsg });
+                var log = Logging.CreateLog("EX0509", HttpContext);
+
+                logger.LogCritical(ex, "{@errorCode} {@method} {@path} {@queryString} {@userName}",
+                                        log.ErrorCode, log.Method, log.Path, log.QueryString, log.UserName);
+                return StatusCode(500, new { statusCode = log.ErrorCode, message = AppMessages.ServerError });
             }
         }
 
+        [HttpGet("getFeatures")]
+        public async Task<IActionResult> permissions()
+        {
+            try
+            {
+                if (!HasPermission("05001") || !HasPermission("05005") || !HasPermission("05003"))
+                    return BadRequest(new { statusCode = "AE0510", message = AppMessages.noPermission });
 
+                var usersPermissions = from u in db.UserPermissions
+                                       where u.UserId == UserId()
+                                       select u;
+                var features = await (from f in db.Features
+                                      where f.Status != Status.Deleted
+                                      select new
+                                      {
+                                          f.FeatureId,
+                                          f.FeatureName,
+                                          checkAll = false,
+                                          permissions = (from p in usersPermissions
+                                                         where p.Permission.FeatureId == f.FeatureId
+                                                         select new
+                                                         {
+                                                             p.PermissionId,
+                                                             p.Permission.PermissionName,
+                                                             p.Permission.Code
+                                                         }).ToList()
+                                      }).ToListAsync();
+
+                return Ok(new { statusCode = 1, features });
+            }
+            catch (Exception ex)
+            {
+                var log = Logging.CreateLog("EX0510", HttpContext);
+
+                logger.LogCritical(ex, "{@errorCode} {@method} {@path} {@queryString} {@userName}",
+                                        log.ErrorCode, log.Method, log.Path, log.QueryString, log.UserName);
+                return StatusCode(500, new { statusCode = log.ErrorCode, message = AppMessages.ServerError });
+            }
+        }
+        private string BodyEmail(string title, string userName, string password)
+        {
+            String body = @$"
+                <html>
+                    <body style='background-color: #f4f4f5;'>
+                      <table cellpadding='0' cellspacing='0' style='width:100%; height:100%;background-color:#f4f4f5;text-align:center;'>
+                        <tbody>
+                          <tr>
+                            <td style='text-align: center;'>
+                              <table align='center' cellpadding='0' cellspacing='0' id='body'
+                                style='background-color:#fff;width:100%;max-width:680px; height:100%;'>
+                                <tbody>
+                                  <tr>
+                                    <td>
+                                      <table align='center' cellpadding='0' cellspacing='0'
+                                        class='padding-left:0 !important;padding-right:0 !important;'
+                                        style='text-align:left;padding-bottom:88px;width: 100%; padding-left: 120px; padding-right:120px;'>
+                                        <tbody>
+                                          <tr>
+                                            <td style='padding-top:15px;'>
+                                              <img src='{path}' style='width:200px;padding-left:72px'>
+                                            </td>
+                                          </tr>
+                                          <tr>
+                                            <td colspan='2'
+                                              style='padding-top:30px;padding-left:72px;color: #000000; font-size:30px; font-smoothing: always; font-style: normal; font-weight: 600;'>
+                                            {title}
+                                            </td>
+                                          </tr>
+                                          <tr>
+                                            <td style='padding-top: 48px; padding-bottom: 48px;'>
+                                              <table cellpadding='0' cellspacing='0' style='width:100%'>
+                                                <tbody>
+                                                  <tr>
+                                                    <td
+                                                      style='width:100%; height: 1px; max-height: 1px; background-color: #d9dbe0; opacity: 0.81'>
+                                                      </td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td>
+                                                      <p align='right'> {userName} <b>: اسم المستخدم </b></p>
+                                                    </td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td>
+                                                      <p align='right'>{password} <b>: كلمة المرور </b></p>
+                                                    </td>
+                                                  </tr>
+                                                </tbody>
+                                                </table>
+                                            </td>
+                                          </tr>
+
+                                        </tbody>
+                                        </tabel>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                                </tabel>
+                            </td>
+                          </tr>
+                        </tbody>
+                        </tabel>
+                    </body>
+            </html>";
+            return body;
+        }
 
     }
+
+
+
 }

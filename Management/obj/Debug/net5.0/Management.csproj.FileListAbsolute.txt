@@ -320,3 +320,10 @@ D:\projects\NCDC\Management\obj\Debug\net5.0\refint\Management.dll
 D:\projects\NCDC\Management\obj\Debug\net5.0\Management.pdb
 D:\projects\NCDC\Management\obj\Debug\net5.0\Management.genruntimeconfig.cache
 D:\projects\NCDC\Management\obj\Debug\net5.0\ref\Management.dll
+D:\Demo\NCDC\Management\obj\Debug\net5.0\Management.csproj.AssemblyReference.cache
+D:\Demo\NCDC\Management\obj\Debug\net5.0\Management.GeneratedMSBuildEditorConfig.editorconfig
+D:\Demo\NCDC\Management\obj\Debug\net5.0\Management.AssemblyInfoInputs.cache
+D:\Demo\NCDC\Management\obj\Debug\net5.0\Management.AssemblyInfo.cs
+D:\Demo\NCDC\Management\obj\Debug\net5.0\Management.csproj.CoreCompileInputs.cache
+D:\Demo\NCDC\Management\obj\Debug\net5.0\Management.MvcApplicationPartsAssemblyInfo.cs
+D:\Demo\NCDC\Management\obj\Debug\net5.0\Management.MvcApplicationPartsAssemblyInfo.cache

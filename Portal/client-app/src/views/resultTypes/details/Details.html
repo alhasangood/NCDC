@@ -1,0 +1,15 @@
+﻿<div>
+  <div class="card-area">
+    <v-card flat class="px-4 pb-4">
+      <v-toolbar flat class="mb-2">
+        <v-spacer />
+        <v-btn color="primary" depressed @click="$emit('back')">عودة</v-btn>
+      </v-toolbar>
+      <v-row>
+        <AppReadonlyField label="الاسم" :value="resultTypes.resultTypeName" />
+        <!-- <AppReadonlyField label="الوصف" :value="resultTypes.description" /> -->
+      </v-row>
+    </v-card>
+  </div>
+
+</div>
