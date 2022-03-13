@@ -1,4 +1,4 @@
-﻿<template src="./Add.html"></template>
+﻿<template src="./Result.html"></template>
 
 <script>
 export default {
@@ -10,17 +10,16 @@ export default {
   },
   data() {
     return {
-      analysisType: {
-        analysisTypeName: null,
-        analysisTypeCode: null,
-        description: null,
-      },
+      results: [],
     };
   },
   methods: {
     confirm() {
       this.$store
-        .dispatch("analysisTypes/add", this.analysisType)
+        .dispatch("analysisTypes/result", {
+          id: this.itemId,
+          payload: this.results,
+        })
         .then(() => {
           this.back();
         })

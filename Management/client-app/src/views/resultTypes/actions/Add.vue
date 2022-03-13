@@ -1,35 +1,29 @@
-﻿<template src="./Add.html">
-</template>
+﻿<template src="./Add.html"></template>
 
 <script>
-    export default {
-        created() {
-         
-        },
-        computed: {
-         
-        },
-        data() {
-            return {
-                features: [],
-                user: {
-                    regionCenterId: null,
-                    healthCenterId: null,
-                    loginName: null,
-                    fullName: null,
-                    jobDescription: null,
-                    userType: 1,
-                    phoneNo: null,
-                    email: null,
-                    permissions: [],
-                },
-            };
-        },
-        methods: {
-            back() {
-                this.$emit("back");
-            },
-
-        },
+export default {
+  created() {},
+  computed: {},
+  data() {
+    return {
+      resultType: {
+        resultTypeName: null,
+        // description: null,
+      },
     };
+  },
+  methods: {
+    confirm() {
+      this.$store
+        .dispatch("resultTypes/add", this.resultType)
+        .then(() => {
+          this.back();
+        })
+        .catch(() => {});
+    },
+    back() {
+      this.$emit("back");
+    },
+  },
+};
 </script>

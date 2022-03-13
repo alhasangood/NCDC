@@ -9,73 +9,88 @@
           </v-toolbar>
 
           <v-row align="center">
-            <AppFormField
-              label="اسم المستخدم"
-              v-model="user.loginName"
-              rules="required|username|max:50" :counter="50"
-            />
-            <AppFormField
-              label="الاسم بالكامل"
-              v-model="user.fullName"
-              rules="required|arabic|max:100" :counter="100"
-            />
-            <AppFormField
-              label="الوصف الوظيفي"
-              v-model="user.jobDescription"
-              rules="required|arabic|max:20" :counter="20"
-            />
-            <AppFormField
-              label="رقم الهاتف"
-              v-model="user.phoneNo"
-              rules="required|phone|libyanPhone"
-            />
-            <AppFormField
-              label="البريد الالكتروني"
-              v-model="user.email"
-              rules="required|email|max:50" :counter="50"
-            />
+            <AppFormField label="الاسم بالكامل" v-model="user.fullName" rules="required|arabic|max:100"
+              :counter="100" />
+            <AppFormSelect label="Nationality (الجنسية)" v-model="patient.personalInformation.nationalityId"
+              :items="nationalities" rules="required" :lg="3" :md="4" :sm="6" @change="changeNationality()" />
+            <AppFormSelect label="Identification Type (نوع اثبات الهوية)"
+              v-model="patient.personalInformation.identificationType" :items="identificationTypes" rules="required"
+              :lg="3" :md="4" :sm="6" v-if="patient.personalInformation.nationalityId == 1 "
+              @change="changeIdentificationType()" />
+
+            <AppFormField label="National No ( الرقم الوطني)" v-model="patient.personalInformation.nationalNo"
+              v-if="patient.personalInformation.identificationType == 1 " :rules="nationalNumberRules" :lg="3" :md="4"
+              :sm="6" />
+
+            <AppFormField label="Administrative No ( الرقم الادراي)" v-model="patient.personalInformation.nationalNo"
+              v-if="patient.personalInformation.identificationType == 2 " :rules="administrativeRules" :lg="3" :md="4"
+              :sm="6" />
+
+            <AppFormField label="Passport (رقم جواز السفر)" v-model="patient.personalInformation.passport"
+              v-if="patient.personalInformation.nationalityId != 1 " rules="required|english_num" :lg="3" :md="4"
+              :sm="6" />
+
+            </template>
+
+            <AppFormField label="First Name (الاسم الأول)" v-model="patient.personalInformation.firstName"
+              :rules="IsRequired" :lg="3" :md="4" :sm="6" :disabled="disabledName" />
+
+            <AppFormField label="Father Name (اسم الأب)  " v-model="patient.personalInformation.fatherName"
+              :rules="IsRequired" :lg="3" :md="4" :sm="6" :disabled="disabledName" />
+
+            <AppFormField label="Grandfather Name (اسم الجد)" v-model="patient.personalInformation.grandfatherName"
+              :rules="IsRequired" :lg="3" :md="4" :sm="6" :disabled="disabledName" />
+
+            <AppFormField label="SurName (اللقب)" v-model="patient.personalInformation.surName" :lg="3" :md="4" :sm="6"
+              :disabled="disabledName" />
+
+            <AppDatePicker label=" BirthDate (تاريخ الميلاد)" :allowed-dates="allowedDates"
+              v-model="patient.personalInformation.birthDate" :rules="IsRequired" :lg="3" :md="4" :sm="6"
+              :disabled="disabledName" />
+
+
+
+            <AppFormField label="Mother Name (اسم الام)" v-model="patient.personalInformation.motherName" rules=""
+              :lg="3" :md="4" :sm="6" />
+
+
+            <AppFormSelect label="Gender (الجنس)" v-model="patient.personalInformation.gender" :items="genders"
+              :rules="IsRequired" :lg="3" :md="4" :sm="6" :disabled="disabledName" />
+
+            <AppFormSelect label="City (المدينة)" v-model="patient.personalInformation.cityId" :items="cities"
+              rules="required" :lg="3" :md="4" :sm="6" @change="getMunicipalities" />
+
+            <AppFormSelect label="Municipal (البلدية)" v-model="patient.personalInformation.municipalId"
+              :items="municipalities" rules="required" :lg="3" :md="4" :sm="6"
+              :disabled="patient.personalInformation.cityId == null" />
+
+            <AppFormSelect label="Locality (المحله)" v-model="patient.personalInformation.localityId"
+              :items="localities" rules="" :lg="3" :md="4" :sm="6" />
+
+            <AppFormSelect label="Conutry of birth (الدولة الميلاد)" v-model="patient.personalInformation.countryId"
+              :items="countries" rules="required" :lg="3" :md="4" :sm="6" @change="changeConutry" />
+
+            <template v-if="patient.personalInformation.countryId == 1">
+
+              <AppFormSelect label="City of birth (مدينة الميلاد)    " v-model="patient.personalInformation.birthCity"
+                :items="cities" rules="required" :lg="3" :md="4" :sm="6" @change="getBirthMunicipalities" />
+
+              <AppFormSelect label="Municipality of birth ( بلدية الميلاد)"
+                v-model="patient.personalInformation.birthMunicipality" :items="birthMunicipalities" rules="required"
+                :lg="3" :md="4" :sm="6" :disabled="patient.personalInformation.birthCity == null" />
+
+            </template>
+            <template v-else>
+              <AppFormField label="Place of birth  (مكان الميلاد)" v-model="patient.personalInformation.birthPlace"
+                rules="required" :lg="3" :md="4" :sm="6" />
+            </template>
+
+
+            <AppFormField label="Phone Number (رقم الهاتف)" v-model="patient.personalInformation.mobileNo"
+              rules="required|libyanPhone" :lg="3" :md="4" :sm="6" />
           </v-row>
         </v-card>
-        <v-card flat class="px-4 py-1 mt-6">
-          <v-toolbar flat color="transparent">
-            <v-toolbar-title>
-              <h6 class="mb-2">الصلاحيات</h6>
-            </v-toolbar-title>
-            <v-divider class="mx-4" inset vertical />
-          </v-toolbar>
-          <v-expansion-panels class="justify-start" multiple>
-            <v-col
-              cols="12"
-              md="6"
-              v-for="(item,i) in features"
-              :key="item.featureId"
-            >
-              <v-expansion-panel v-if="item.permissions.length">
-                <v-expansion-panel-header color="head">
-                  {{item.featureName}}
-                </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <v-row>
-                    <v-col
-                      cols="6"
-                      v-for="(item,i) in item.permissions"
-                      :key="i"
-                    >
-                      <v-checkbox
-                        :value="item.permissionId"
-                        color="success"
-                        :label="item.permissionName"
-                        v-model="user.permissions"
-                        hide-details
-                      >
-                      </v-checkbox>
-                    </v-col>
-                  </v-row>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-            </v-col>
-          </v-expansion-panels>
-        </v-card>
+
         <v-card flat class="px-4 py-1 mt-6">
           <v-row>
             <v-col class="text-end">

@@ -1,6 +1,6 @@
 import apiClient from "../apiClient";
 
-const resource = "users";
+const resource = "resultTypes";
 
 export default {
     getAll: params => apiClient.get(`${resource}?${params}`),
@@ -11,6 +11,4 @@ export default {
     lock: id => apiClient.put(`${resource}/${id}/lock`),
     unlock: id => apiClient.put(`${resource}/${id}/unlock`),
     delete: id => apiClient.delete(`${resource}/${id}`),
-    resetPassword: (id) => apiClient.get(`${resource}/${id}/resetPassword`),
-    getFeatures: () => apiClient.get(`${resource}/getFeatures`)
 };

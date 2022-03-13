@@ -33,14 +33,14 @@ export default {
       },
       headers: [
         {
-          text: "اسم المستخدم",
+          text: "الاسم",
           value: "loginName",
           sortable: false,
           align: "start",
         },
-        { text: "نوع المستخدم   ", value: "userType", sortable: false },
-        { text: "الوصف الوظيفي ", value: "jobDescription", sortable: false },
-        { text: "السجل التابع له  ", value: "parentCenter", sortable: false },
+        { text: "الجنس", value: "userType", sortable: false },
+        { text: "الجنسية", value: "userType", sortable: false },
+        { text: "رقم التسجيل", value: "userType", sortable: false },
         { text: "الحالة ", value: "status", sortable: false },
         { text: "مسجل بواسطة", value: "createdBy", sortable: false },
         { text: "تاريخ التسجيل", value: "createdOn", sortable: false },

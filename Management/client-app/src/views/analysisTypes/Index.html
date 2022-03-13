@@ -1,4 +1,4 @@
-<AppPageContainer title="المستخدمين" :subtitle="subtitle">
+<AppPageContainer title="انواع التحاليل" :subtitle="subtitle">
   <div v-if="view === 0">
 
     <div class="card-area">
@@ -7,14 +7,14 @@
         <v-row class="mx-4">
           <v-spacer />
           <v-col class="text-end">
-            <v-btn color="primary" depressed @click="addItem">إضافة مستخدم</v-btn>
+            <v-btn color="primary" depressed @click="addItem">إضافة تحليل</v-btn>
           </v-col>
         </v-row>
 
         <ValidationObserver v-slot="{ handleSubmit }">
           <form @submit.prevent="handleSubmit(getAll)">
             <v-row class="mx-2" align="center">
-                         <AppFormField label=" اسم المستخدم" v-model="filters.search" @change="getAll" />
+              <AppFormField label=" اسم التحليل" v-model="filters.search" @change="getAll" />
               <v-col cols="1">
                 <v-btn type="submit" depressed color="primary">بحث</v-btn>
               </v-col>
@@ -23,20 +23,17 @@
         </ValidationObserver>
         <v-container fluid>
 
-          <v-data-table :headers="headers" :items="users" disable-pagination hide-default-footer>
+          <v-data-table :headers="headers" :items="analysisTypes" disable-pagination hide-default-footer>
             <template v-slot:item.status="{ item }">
               {{ item.status | status }}
             </template>
-            <template v-slot:item.userType="{ item }">
-              {{ item.userType | userTypes }}
-            </template>
+           
             <template v-slot:item.actions="{ item }">
               <AppIconTooltip tooltip="عرض التفاصيل" icon="mdi-eye-outline" @click="showDetails(item)"/>
               <AppIconTooltip tooltip="تعديل" icon="mdi-pencil-outline" @click="editItem(item)" />
               <AppIconTooltip tooltip="حذف" icon="mdi-delete-outline" @click="showDialog(item, 'delete')" />
               <AppIconTooltip tooltip="تجميد" icon="mdi-lock" @click="showDialog(item, 'lock')" v-if="item.status === $status.active " />
-              <AppIconTooltip tooltip="تفعيل" icon="mdi-lock-open" @click="showDialog(item, 'unlock')"  v-if="item.status === $status.locked" />
-              <AppIconTooltip tooltip="إعادة تعيين كلمةالمرور" icon="mdi-lock-reset" @click="showDialog(item, 'resetPassword')"/>
+              <AppIconTooltip tooltip="نتائج" icon="mdi-text-box-plus-outline" @click="showResult(item)" v-if="item.status === $status.active " />
             </template>
           </v-data-table>
         </v-container>
@@ -52,4 +49,5 @@
   <AddView v-if="view === 1" @back="back" />
   <EditView v-if="view === 2" @back="back" :itemId="itemId" />
   <DetailsView v-if="view === 3" @back="back" :itemId="itemId" />
+  <ResultView v-if="view === 4" @back="back" :itemId="itemId" />
 </AppPageContainer>

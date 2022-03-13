@@ -1,4 +1,4 @@
-﻿<template src="./Details.html"> </template>
+﻿<template src="./Details.html"></template>
 
 <script>
 export default {
@@ -9,15 +9,17 @@ export default {
     },
   },
   created() {
+      this.$store
+      .dispatch("analysisTypes/getDetails", this.itemId);
   },
   data() {
-     return {
-user:{
-  loginName:null
-}     };
+    return {
+    };
   },
   computed: {
- 
+    analysisType() {
+      return this.$store.state.analysisTypes.analysisType;
+    },
   },
 };
 </script>

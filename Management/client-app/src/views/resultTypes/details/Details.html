@@ -6,7 +6,8 @@
         <v-btn color="primary" depressed @click="$emit('back')">عودة</v-btn>
       </v-toolbar>
       <v-row>
-        <AppReadonlyField label="اسم المستخدم" :value="user.loginName" />
+        <AppReadonlyField label="الاسم" :value="resultTypes.resultTypeName" />
+        <!-- <AppReadonlyField label="الوصف" :value="resultTypes.description" /> -->
       </v-row>
     </v-card>
   </div>

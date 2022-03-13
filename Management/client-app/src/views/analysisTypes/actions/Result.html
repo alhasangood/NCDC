@@ -9,25 +9,19 @@
           </v-toolbar>
 
           <v-row align="center">
-            <AppFormField
-              label="اسم التحليل"
-              v-model="analysisType.analysisTypeName"
-              rules="required|max:150" :counter="150"
-            />
-            <AppFormField
-              label="رمز التحليل"
-              v-model="analysisType.analysisTypeCode"
-              rules="required|max:150" :counter="150"
-            />
-            <AppTextArea
-              label="وصف التحليل"
-              v-model="analysisType.description"
-              rules="required|max:200" :counter="200"
-            />
-       
+            <AppReadonlyField label="اسم التحليل" :value="analysisType.analysisTypeName" />
+            <AppFormSelect label="نتائج التحاليل" v-model="analysisType.resultTypeId" :items="resultsTypes"
+              rules="required" />
           </v-row>
+          <v-container fluid>
+            <v-data-table :headers="headers" :items="results" disable-pagination hide-default-footer>
+              <template v-slot:item.actions="{ item }">
+                <AppIconTooltip tooltip="حذف" icon="mdi-delete-outline" @click="showDialog(item, 'delete')" />
+              </template>
+            </v-data-table>
+          </v-container>
         </v-card>
-   
+
         <v-card flat class="px-4 py-1 mt-6">
           <v-row>
             <v-col class="text-end">

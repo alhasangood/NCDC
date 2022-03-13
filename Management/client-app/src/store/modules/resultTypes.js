@@ -9,26 +9,24 @@ import {
 } from "../../utils/helpers";
 import { status } from "../../utils/common";
 const state = {
-    users: [],
+    resultTypes: [],
     totalItems: 0,
-    user: {},
-    features: {}
+    resultType: {},
 };
 
 const getters = {
-    index: state => id => state.users.findIndex(i => i.userId === id)
+    index: state => id => state.resultTypes.findIndex(i => i.resultTypesId === id)
 };
 
 const mutations = {
-    setUsers: (state, users) => (state.users = users),
+    setResultTypess: (state, resultTypes) => (state.resultTypes = resultTypes),
     setTotalItems: (state, totalItems) => (state.totalItems = totalItems),
-    setUser: (state, user) => (state.user = user),
-    setFeatures: (state, features) => (state.features = features),
-    add: (state, user) => state.users.unshift(user),
-    edit: (state, { index, user }) => state.users.splice(index, 1, user),
-    lock: (state, index) => (state.users[index].status = status.locked),
-    unlock: (state, index) => (state.users[index].status = status.active),
-    delete: (state, index) => state.users.splice(index, 1)
+    setResultType: (state, resultType) => (state.resultType = resultType),
+    add: (state, resultType) => state.resultTypes.unshift(resultType),
+    edit: (state, { index, resultType }) => state.resultTypess.splice(index, 1, resultType),
+    lock: (state, index) => (state.resultTypes[index].status = status.locked),
+    unlock: (state, index) => (state.resultTypes[index].status = status.active),
+    delete: (state, index) => state.resultTypes.splice(index, 1)
 };
 
 const actions = {
@@ -40,7 +38,7 @@ const actions = {
                 .join("&");
 
             startLoading()
-            const response = await dataService.users.getAll(paramsString);
+            const response = await dataService.resultTypes.getAll(paramsString);
             stopLoading()
 
             if (!response.data.statusCode) {
@@ -48,7 +46,7 @@ const actions = {
                 return;
             }
 
-            commit("setUsers", response.data.users);
+            commit("setResultTypes", response.data.resultTypes);
             commit("setTotalItems", response.data.totalItems);
         } catch (error) {
             stopLoading()
@@ -57,10 +55,10 @@ const actions = {
     },
     async getDetails({ commit }, id) {
         try {
-            commit("setUser", {});
+            commit("setResultType", {});
 
             startLoading()
-            const response = await dataService.users.getDetails(id);
+            const response = await dataService.resultTypes.getDetails(id);
             stopLoading()
 
             if (!response.data.statusCode) {
@@ -68,7 +66,7 @@ const actions = {
                 return;
             }
 
-            commit("setUser", response.data.user);
+            commit("setResultType", response.data.resultType);
         } catch (error) {
             stopLoading()
             catchHandler(error);
@@ -77,7 +75,7 @@ const actions = {
     async getForEdit(_, id) {
         try {
             startLoading()
-            const response = await dataService.users.getForEdit(id);
+            const response = await dataService.resultTypes.getForEdit(id);
             stopLoading()
 
             if (!response.data.statusCode) {
@@ -85,7 +83,7 @@ const actions = {
                 return;
             }
 
-            return Promise.resolve(response.data.user);
+            return Promise.resolve(response.data.resultType);
         } catch (error) {
             stopLoading()
             catchHandler(error);
@@ -94,7 +92,7 @@ const actions = {
     async add({ commit }, payload) {
         try {
             startLoading()
-            const response = await dataService.users.add(payload);
+            const response = await dataService.resultTypes.add(payload);
             stopLoading()
 
             if (!response.data.statusCode) {
@@ -104,7 +102,7 @@ const actions = {
 
             showNotification(response.data.message);
 
-            commit("add", response.data.user);
+            commit("add", response.data.resultType);
         } catch (error) {
             stopLoading()
             catchHandler(error);
@@ -114,7 +112,7 @@ const actions = {
     async edit({ commit, getters}, { id, payload }) {
         try {
             startLoading()
-            const response = await dataService.users.edit(id, payload);
+            const response = await dataService.resultTypes.edit(id, payload);
             stopLoading()
 
             if (!response.data.statusCode) {
@@ -124,8 +122,8 @@ const actions = {
 
             showNotification(response.data.message);
 
-            const index = getters.index(response.data.user.userId);
-            commit("edit", { index, user: response.data.user });
+            const index = getters.index(response.data.resultType.resultTypeId);
+            commit("edit", { index, resultType: response.data.resultType });
         } catch (error) {
             stopLoading()
             catchHandler(error);
@@ -135,7 +133,7 @@ const actions = {
     async lock({ commit, getters }, id) {
         try {
             startLoading()
-            const response = await dataService.users.lock(id);
+            const response = await dataService.resultTypes.lock(id);
             stopLoading()
 
             if (!response.data.statusCode) {
@@ -155,7 +153,7 @@ const actions = {
     async unlock({ commit, getters }, id) {
         try {
             startLoading()
-            const response = await dataService.users.unlock(id);
+            const response = await dataService.resultTypes.unlock(id);
             stopLoading()
 
             if (!response.data.statusCode) {
@@ -175,7 +173,7 @@ const actions = {
     async delete({ commit, getters }, id) {
         try {
             startLoading()
-            const response = await dataService.users.delete(id);
+            const response = await dataService.resultTypes.delete(id);
             stopLoading()
 
             if (!response.data.statusCode) {
@@ -192,41 +190,7 @@ const actions = {
             catchHandler(error);
         }
     },
-    async resetPassword(_,  id) {
-        try {
-            startLoading()
-            const response = await dataService.users.resetPassword(id);
-            stopLoading()
-
-            if (!response.data.statusCode) {
-                showAlert(serverErrorMessage);
-                return;
-            }
-            showAlert(response.data.message);
-        } catch (error) {
-            stopLoading()
-            catchHandler(error);
-        }
-    },
-    async getFeatures({ commit }) {
-        try {
-            commit("setFeatures", {});
-
-            startLoading()
-            const response = await dataService.users.getFeatures();
-            stopLoading()
-
-            if (!response.data.statusCode) {
-                showAlert(serverErrorMessage);
-                return;
-            }
-
-            commit("setFeatures", response.data.features);
-        } catch (error) {
-            stopLoading()
-            catchHandler(error);
-        }
-    },
+ 
 };
 
 export default {

@@ -27,16 +27,8 @@ const routes = [
         name: "analysisTypes",
         component: () => import('../views/analysisTypes/Index.vue')
       }, 
-      {
-        path: "analysisResults",
-        name: "analysisResults",
-        component: () => import('../views/analysisResults/Index.vue')
-      },
-      {
-        path: "medicalAnalysis",
-        name: "medicalAnalysis",
-        component: () => import('../views/medicalAnalysis/Index.vue')
-      },
+      
+
       {
         path: "resultTypes",
         name: "resultTypes",
